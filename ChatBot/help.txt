@@ -1,0 +1,18 @@
+Bot:    Commands avaliable
+------------------------------------
+help			- Displays this message
+clear			- Clears the screen
+date time		- Shows the current date and time
+date			- Shows today's date
+time			- Shows the current time
+encode			- Converts decimal number to bnary/hex
+decode			- Converts a binnary/hex to decimal
+coin flip		- Flips a coin
+joke			- Tells a joke
+mc dir			- Choose your music directory
+mc stop			- Stops the music
+mc pause		- Pause the music
+mc resume 		- Resume the music
+mc next			- Plays the next song
+mc prev			- Plays the previous song
+exit			- Exits the program
