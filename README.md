@@ -11,7 +11,6 @@ A kind of useful chabot
 ## To-dos
 * Fix autoscroll
 * Add more convo starters
-* Add error handling for UV index
 * Add snooze for alarm
 * Fix displays after alarm dismissed
 * Update encode and decode function
