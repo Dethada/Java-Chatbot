@@ -108,8 +108,7 @@ public class Methods {
             HttpResponse response = httpClient.execute(getRequest);
 
             if (response.getStatusLine().getStatusCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + response.getStatusLine().getStatusCode());
+                return "Chatbot: received HTTP error code : " + response.getStatusLine().getStatusCode();
             }
 
             BufferedReader br = new BufferedReader(
@@ -126,10 +125,12 @@ public class Methods {
         } catch (ClientProtocolException e) {
 
             e.printStackTrace();
+            return "Chatbot: check your internet connection\n";
 
         } catch (IOException e) {
 
             e.printStackTrace();
+            return "Chatbot: check your internet connection\n";
         }
 
         Gson gson = new Gson();

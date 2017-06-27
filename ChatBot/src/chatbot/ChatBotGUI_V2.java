@@ -42,9 +42,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     int xMouse;
     int yMouse;
 
-    // for special functions
-    int special = 0;
-
     // for alarm clock
     String currentTime;
     String alarmTime;
@@ -732,6 +729,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
             } catch (BadLocationException e) {
                 System.out.println(e);
             }
+        } else if (lowerCaseInput.contains("encode")) {
+            
         } else {
             try {
                 chatbot();
