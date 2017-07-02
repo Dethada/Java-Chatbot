@@ -11,7 +11,4 @@ A kind of useful chabot
 ## To-dos
 * Fix autoscroll
 * Add more convo starters
-* Add snooze for alarm
-* Resume music after alarm
-* Update encode and decode function
 * Add change music dir option
