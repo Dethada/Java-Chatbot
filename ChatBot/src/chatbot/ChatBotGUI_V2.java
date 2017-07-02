@@ -64,7 +64,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
         // Initiate convo
         try {
-            doc.insertString(doc.getLength(), "Chatbot: Hi nice to meet you I am the second generation chat bot. Did you key in your ATS?\n", null);
+            doc.insertString(doc.getLength(), "Chatbot: Hi nice to meet you I am the third generation chat bot. Do you want to listen to some music?\n", null);
         } catch (BadLocationException e) {
             System.out.println(e);
         }
@@ -707,41 +707,45 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     }
 
     public void inputFunction() {
-        StyledDocument doc = chatArea.getStyledDocument();
-        Style style = chatArea.addStyle("I'm a style", null);
-        StyleConstants.setForeground(style, Color.ORANGE);
-
-        // Get input
-        input = inputField.getText();
-        lowerCaseInput = input.toLowerCase();
-
-        // Display input
         try {
-            doc.insertString(doc.getLength(), "You: " + input + "\n", style);
-        } catch (BadLocationException e) {
-            System.out.println(e);
-        }
-
-        if (lowerCaseInput.contains("set alarm")) {
-            alarmTime = input.substring(10);
-            try {
-                doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + alarmTime + "\n", null);
-            } catch (BadLocationException e) {
-                System.out.println(e);
-            }
-        } else if (lowerCaseInput.contains("encode")) {
+            StyledDocument doc = chatArea.getStyledDocument();
+            Style style = chatArea.addStyle("I'm a style", null);
+            StyleConstants.setForeground(style, Color.ORANGE);
             
-        } else {
-            try {
-                chatbot();
-            } catch (InterruptedException | BadLocationException ex) {
-                Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
+            // Get input
+            input = inputField.getText();
+            lowerCaseInput = input.toLowerCase();
+            
+            // Display input
+            doc.insertString(doc.getLength(), "You: " + input + "\n", style);
+            
+            
+            if (lowerCaseInput.contains("set alarm")) {
+                alarmTime = input.substring(10);
+                doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + alarmTime + "\n", null);
+            } else if (lowerCaseInput.contains("encode")) {
+                String value = input.substring(7);
+                doc.insertString(doc.getLength(), "Chatbot: " + methods.Decimal2Bin(value) + "\n", null);
+            } else if (lowerCaseInput.contains("decode")) {
+                // decode 0110 2
+                String v1, v2;
+                v1 = input.substring(7, input.length() - 2);
+                v2 = input.substring(input.length() - 1);
+                doc.insertString(doc.getLength(), "Chatbot: " + v1 + " converted to base 10 is " + methods.decode(v1, v2) + "\n", null);
+            } else {
+                try {
+                    chatbot();
+                } catch (InterruptedException | BadLocationException ex) {
+                    Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+            
+            // clear input text field
+            inputField.setText("");
+            inputField.requestFocus();
+        } catch (BadLocationException ex) {
+            Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        // clear input text field
-        inputField.setText("");
-        inputField.requestFocus();
     }
 
     public void chatbot() throws InterruptedException, BadLocationException {
@@ -769,7 +773,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 + "date\t\t\t\t\t\t- Shows today's date\n"
                 + "time\t\t\t\t\t\t- Shows the current time\n"
                 + "encode\t\t\t\t\t- Converts decimal number to bnary/hex\n"
-                + "decode\t\t\t\t\t- Converts a binnary/hex to decimal\n"
+                + "decode <bin/hex> <base>\t\t- Converts a binnary/hex to decimal\n"
                 + "coin flip\t\t\t\t\t- Flips a coin\n"
                 + "joke\t\t\t\t\t\t- Tells a joke\n"
                 + "mc dir\t\t\t\t\t- Choose your music directory\n"
@@ -844,12 +848,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         case "time":
                         case "what is the time now":
                             doc.insertString(doc.getLength(), "Chatbot: The time now is " + time.format(currentDateTime) + "\n", null);
-                            break;
-                        case "encode":
-                            methods.Decimal2Bin();
-                            break;
-                        case "decode":
-                            methods.decode();
                             break;
                         case "coin flip":
                             doc.insertString(doc.getLength(), "Chatbot: " + methods.coinFlip() + "\n", null);

@@ -54,6 +54,8 @@ public class music {
             playing = false;
 
             Display.setText("Open your music folder to play songs");
+            notiBar.setText("Remeber to key in your ATS!");
+            notiBar2.setText("Remeber to key in your ATS!");
             musicStatus.setText("Stopped");
         }
     }
