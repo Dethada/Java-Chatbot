@@ -250,6 +250,22 @@ public class music {
             }
         }
     }
+    
+    // changes the stored music dir
+    public void changeDir() {
+        JFileChooser chooser = new JFileChooser("D:\\Media");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        
+        int returnVal = chooser.showOpenDialog(null);
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File songpaths = chooser.getSelectedFile();
+            String dirPath = songpaths + "";
+            folder = new File(dirPath);
+            saveProp("musicDir", "" + folder);
+        }
+    }
 
     public void saveProp(String title, String value) {
         try {

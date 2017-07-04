@@ -898,12 +898,16 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             alarmTime = "";
                             doc.insertString(doc.getLength(), "Chatbot: Alarm dismissed\n", null);
                             break;
+                        case "change dir":
+                            mc.changeDir();
+                            doc.insertString(doc.getLength(), "Chatbot: Music directory changed\n", null);
+                            break;
                         // Convos
                         case "bye":
                             typingStatus.setText("Chatbot is typing...");
                             Thread.sleep(randomGenerator.nextInt(251) + 500);
                             typingStatus.setText("");
-                            doc.insertString(doc.getLength(), "Chatbot: " + goodbye[randomGenerator.nextInt(3)] + "\n", null);
+                            doc.insertString(doc.getLength(), "Chatbot: " + goodbye[randomGenerator.nextInt(goodbye.length)] + "\n", null);
                             break;
                         case "okay":
                             typingStatus.setText("Chatbot is typing...");
@@ -967,7 +971,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             typingStatus.setText("Chatbot is typing...");
                             Thread.sleep(randomGenerator.nextInt(1001) + 500);
                             typingStatus.setText("");
-                            doc.insertString(doc.getLength(), "Chatbot: " + defaultReply[randomGenerator.nextInt(5)] + "\n", null);
+                            doc.insertString(doc.getLength(), "Chatbot: " + defaultReply[randomGenerator.nextInt(defaultReply.length)] + "\n", null);
                             break;
                     } // switch
                 } catch (InterruptedException | BadLocationException | IOException ex) {
