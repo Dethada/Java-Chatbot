@@ -19,6 +19,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
@@ -89,7 +90,6 @@ public class music {
             notiBar2.setText(currentSong);
             musicStatus.setText("Playing");
         } catch (FileNotFoundException | JavaLayerException ex) {
-
         } catch (IOException ex) {
             Logger.getLogger(music.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -106,48 +106,45 @@ public class music {
                         Play(folder + "\\" + currentSong);
                     }
                 } catch (JavaLayerException ex) {
-
                 }
-
             }
         }.start();
-    }
+    } // Play()
 
     public void Resume() throws IOException {
-        // reshuffle playlist if music was stopped
-        if (stopped) {
-            restart();
-            stopped = false;
-        } else if (!playing) {
-            Display.setText(currentSong);
-            notiBar.setText(currentSong);
-            notiBar2.setText(currentSong);
-            musicStatus.setText("Playing");
-            try {
-                FIS = new FileInputStream(folder + "\\" + currentSong);
-                BIS = new BufferedInputStream(FIS);
+        if (!songs.isEmpty()) {
+            // reshuffle playlist if music was stopped
+            if (stopped) {
+                restart();
+                stopped = false;
+            } else if (!playing) {
+                Display.setText(currentSong);
+                notiBar.setText(currentSong);
+                notiBar2.setText(currentSong);
+                musicStatus.setText("Playing");
+                try {
+                    FIS = new FileInputStream(folder + "\\" + currentSong);
+                    BIS = new BufferedInputStream(FIS);
 
-                player = new Player(BIS);
+                    player = new Player(BIS);
 
-                FIS.skip(songTotalLength - pauseLocation);
-                pauseLocation = 0;
-            } catch (JavaLayerException ex) {
-
-            }
-
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        player.play();
-                    } catch (JavaLayerException ex) {
-
-                    }
-
+                    FIS.skip(songTotalLength - pauseLocation);
+                    pauseLocation = 0;
+                } catch (JavaLayerException ex) {
                 }
-            }.start();
-        }
-    }
+
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            player.play();
+                        } catch (JavaLayerException ex) {
+                        }
+                    }
+                }.start();
+            } // else if
+        } // if
+    } // Resume()
 
     public void next() {
         playing = true;
@@ -193,8 +190,6 @@ public class music {
                 for (File listOfFile : listOfFiles) {
                     if (listOfFile.isFile() && listOfFile.getName().endsWith(".mp3")) {
                         songs.add(listOfFile.getName());
-                    } else if (listOfFile.isDirectory()) {
-                        System.out.println("Directory " + listOfFile.getName());
                     }
                 }
 
@@ -205,7 +200,7 @@ public class music {
                 Play(folder + "\\" + currentSong);
                 saveProp("fileChoosen", "yes");
             } else {
-                System.out.println("No Selection ");
+                JOptionPane.showMessageDialog(null, "No selection", "Error", 0);
             }
         } else {
             songs.clear();
@@ -215,8 +210,6 @@ public class music {
             for (File listOfFile : listOfFiles) {
                 if (listOfFile.isFile() && listOfFile.getName().endsWith(".mp3")) {
                     songs.add(listOfFile.getName());
-                } else if (listOfFile.isDirectory()) {
-                    System.out.println("Directory " + listOfFile.getName());
                 }
             }
 
@@ -250,15 +243,15 @@ public class music {
             }
         }
     }
-    
+
     // changes the stored music dir
     public void changeDir() {
         JFileChooser chooser = new JFileChooser("D:\\Media");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
-        
+
         int returnVal = chooser.showOpenDialog(null);
-        
+
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File songpaths = chooser.getSelectedFile();
             String dirPath = songpaths + "";
@@ -272,7 +265,6 @@ public class music {
             prop.setProperty(title, value);
             prop.store(new FileOutputStream(settingsName), null);
         } catch (IOException e) {
-
         }
     }
 
@@ -283,7 +275,6 @@ public class music {
             prop.load(new FileInputStream(settingsName));
             value = prop.getProperty(title);
         } catch (IOException e) {
-
         }
 
         return value;

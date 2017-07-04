@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -44,7 +45,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
     // for alarm clock
     String currentTime;
-    String alarmTime;
+    String alarmTime = "";
 
     // inputs
     String input;
@@ -654,7 +655,11 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     }//GEN-LAST:event_pauseMouseReleased
 
     private void chooseMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chooseMouseReleased
-        mc.chooseDir();
+        try {
+            mc.chooseDir();
+        } catch (IndexOutOfBoundsException ex) {
+            JOptionPane.showMessageDialog(null, "Invalid directory", "Error", 0);
+        }
     }//GEN-LAST:event_chooseMouseReleased
 
     private void nextMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_nextMouseReleased
@@ -706,7 +711,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         });
     }
 
-    public void inputFunction() {
+    private void inputFunction() {
         try {
             StyledDocument doc = chatArea.getStyledDocument();
             Style style = chatArea.addStyle("I'm a style", null);
@@ -748,7 +753,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         }
     }
 
-    public void chatbot() throws InterruptedException, BadLocationException {
+    private void chatbot() throws InterruptedException, BadLocationException {
         // Get file directories
         String fileGreetings = System.getProperty("user.dir") + "\\replies\\greetings.txt";
         String fileJokes = System.getProperty("user.dir") + "\\replies\\jokes.txt";
@@ -880,7 +885,11 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             }
                             break;
                         case "mc dir":
-                            mc.chooseDir();
+                            try {
+                                mc.chooseDir();
+                            } catch (IndexOutOfBoundsException ex) {
+                                JOptionPane.showMessageDialog(null, "Invalid directory", "Error", 0);
+                            }
                             doc.insertString(doc.getLength(), "Chatbot: Music directory choosen " + folder + "\n", null);
                             break;
                         case "uv":

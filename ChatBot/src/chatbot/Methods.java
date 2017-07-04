@@ -8,8 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import static chatbot.ChatBotGUI_V2.clock;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
