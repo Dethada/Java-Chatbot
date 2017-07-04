@@ -1,6 +1,16 @@
 # Java ChatBot
 A kind of useful chabot
 
+## Features
+1. GUI
+2. Music Player
+3. UV index
+4. Clock
+5. Alarm
+6. Encode & decode numbers
+7. Reads replies from file
+8. Tells jokes
+
 ## Possible features
 * Have I been pwned api
 * Reminders
@@ -11,4 +21,6 @@ A kind of useful chabot
 ## To-dos
 * Fix autoscroll
 * Add more convo starters
-* Add change music dir option
+* Fix last song problem
+* Convert Methods class methods to static
+* Store all replies to txt file
