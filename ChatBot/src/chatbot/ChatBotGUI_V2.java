@@ -34,7 +34,6 @@ import javax.swing.text.StyledDocument;
 public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
     music mc = new music();
-    Methods methods = new Methods();
 
     /**
      * Creates new form ChatBotGUI_V2
@@ -730,13 +729,13 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + alarmTime + "\n", null);
             } else if (lowerCaseInput.contains("encode")) {
                 String value = input.substring(7);
-                doc.insertString(doc.getLength(), "Chatbot: " + methods.Decimal2Bin(value) + "\n", null);
+                doc.insertString(doc.getLength(), "Chatbot: " + Methods.Decimal2Bin(value) + "\n", null);
             } else if (lowerCaseInput.contains("decode")) {
                 // decode 0110 2
                 String v1, v2;
                 v1 = input.substring(7, input.length() - 2);
                 v2 = input.substring(input.length() - 1);
-                doc.insertString(doc.getLength(), "Chatbot: " + v1 + " converted to base 10 is " + methods.decode(v1, v2) + "\n", null);
+                doc.insertString(doc.getLength(), "Chatbot: " + v1 + " converted to base 10 is " + Methods.decode(v1, v2) + "\n", null);
             } else {
                 try {
                     chatbot();
@@ -754,9 +753,11 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     }
 
     private void chatbot() throws InterruptedException, BadLocationException {
-        // Get file directories
-        String fileGreetings = System.getProperty("user.dir") + "\\replies\\greetings.txt";
-        String fileJokes = System.getProperty("user.dir") + "\\replies\\jokes.txt";
+        // file paths
+        String pathGreetings = System.getProperty("user.dir") + "\\replies\\greetings.txt";
+        String pathJokes = System.getProperty("user.dir") + "\\replies\\jokes.txt";
+        String pathGoodbye = System.getProperty("user.dir") + "\\replies\\goodbye.txt";
+        String pathDefault = System.getProperty("user.dir") + "\\replies\\default.txt";
 
         // Initialize the objects
         Random randomGenerator = new Random();
@@ -766,8 +767,12 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         DateTimeFormatter date = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
         DateTimeFormatter time = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
         LocalDateTime currentDateTime = LocalDateTime.now();
-        ArrayList<String> greetings = new ArrayList<>();
-        ArrayList<String> jokes = new ArrayList<>();
+        
+        // Read stored replies from file
+        ArrayList<String> greetings = Methods.readFile(pathGreetings);
+        ArrayList<String> jokes = Methods.readFile(pathJokes);
+        ArrayList<String> goodbye = Methods.readFile(pathGoodbye);
+        ArrayList<String> defaultReply = Methods.readFile(pathDefault);
 
         // Replies
         String help = "Bot:    Commands avaliable\n"
@@ -791,43 +796,11 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 + "set alarm 00:00:00 AM/PM\t\t- Set at entered time\n"
                 + "dismiss alarm\t\t\t\t- Dismiss any alarm set\n"
                 + "exit\t\t\t\t\t\t- Exits the program\n";
-        String[] defaultReply = {"I do not understand what you are saying", "Can you please rephrase?", "I don't understand", "I'm not sure i get what you mean",
-            "Are you speaking english?"};
-        String[] goodbye = {"Okay bye~", "See you again", "Goodbye"};
 
         new Thread() {
             @Override
             public void run() {
                 try {
-                    // Read replies from file for greetings
-                    try {
-
-                        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileGreetings)));
-                        String line;
-
-                        while ((line = br.readLine()) != null) {
-                            greetings.add(line);
-                        }
-                        br.close();
-
-                    } catch (IOException e) {
-                        System.out.println("ERROR: unable to read file " + fileGreetings);
-                    }
-
-                    // Read replies from file for jokes
-                    try {
-
-                        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileJokes)));
-                        String line;
-
-                        while ((line = br.readLine()) != null) {
-                            jokes.add(line);
-                        }
-                        br.close();
-
-                    } catch (IOException e) {
-                        System.out.println("ERROR: unable to read file " + fileGreetings);
-                    }
 
                     // Send replies
                     switch (lowerCaseInput) {
@@ -855,7 +828,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             doc.insertString(doc.getLength(), "Chatbot: The time now is " + time.format(currentDateTime) + "\n", null);
                             break;
                         case "coin flip":
-                            doc.insertString(doc.getLength(), "Chatbot: " + methods.coinFlip() + "\n", null);
+                            doc.insertString(doc.getLength(), "Chatbot: " + Methods.coinFlip() + "\n", null);
                             break;
                         case "mc resume":
                             mc.Resume();
@@ -893,7 +866,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             doc.insertString(doc.getLength(), "Chatbot: Music directory choosen " + folder + "\n", null);
                             break;
                         case "uv":
-                            doc.insertString(doc.getLength(), methods.getData(), null);
+                            doc.insertString(doc.getLength(), Methods.getData(), null);
                             break;
                         case "alarm":
                             if (!alarmTime.equals("")) {
@@ -916,7 +889,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             typingStatus.setText("Chatbot is typing...");
                             Thread.sleep(randomGenerator.nextInt(251) + 500);
                             typingStatus.setText("");
-                            doc.insertString(doc.getLength(), "Chatbot: " + goodbye[randomGenerator.nextInt(goodbye.length)] + "\n", null);
+                            doc.insertString(doc.getLength(), "Chatbot: " + goodbye.get(randomGenerator.nextInt(goodbye.size())) + "\n", null);
                             break;
                         case "okay":
                             typingStatus.setText("Chatbot is typing...");
@@ -980,7 +953,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             typingStatus.setText("Chatbot is typing...");
                             Thread.sleep(randomGenerator.nextInt(1001) + 500);
                             typingStatus.setText("");
-                            doc.insertString(doc.getLength(), "Chatbot: " + defaultReply[randomGenerator.nextInt(defaultReply.length)] + "\n", null);
+                            doc.insertString(doc.getLength(), "Chatbot: " + defaultReply.get(randomGenerator.nextInt(defaultReply.size())) + "\n", null);
                             break;
                     } // switch
                 } catch (InterruptedException | BadLocationException | IOException ex) {

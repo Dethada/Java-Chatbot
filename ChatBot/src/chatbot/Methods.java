@@ -3,19 +3,16 @@
  */
 package chatbot;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
-import static chatbot.ChatBotGUI_V2.clock;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -29,7 +26,7 @@ public class Methods {
 
     // Takes a decimal number as arg then returns binary and
     // hex value of the decimal as a string
-    public String Decimal2Bin(String value) {
+    public static String Decimal2Bin(String value) {
         int intValue = Integer.parseInt(value);
 
         // Converts and prints the answer
@@ -38,7 +35,7 @@ public class Methods {
     } // end Decimal2Bin
 
     // Takes binary/hex value and converts to decimal
-    public int decode(String value, String base) {
+    public static int decode(String value, String base) {
         int intBase = Integer.parseInt(base);
 
         //Integer.valueOf("AB", 16);
@@ -46,7 +43,7 @@ public class Methods {
     } // end decode
 
     // Flips a coin
-    public String coinFlip() {
+    public static String coinFlip() {
         // new Random object
         Random randomGenerator = new Random();
 
@@ -54,31 +51,10 @@ public class Methods {
         return (flip[randomGenerator.nextInt(2)]);
     } // end coinFlip()
 
-    public void clock() {
-        DateTimeFormatter time = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        String currentTime = time.format(currentDateTime);
-
-        clock.setText(time.format(currentDateTime));
-
-        try {
-            TimeUnit.SECONDS.sleep(1);
-            currentDateTime = LocalDateTime.now();
-        } catch (InterruptedException e) {
-
-        }
-
-        if (!currentTime.equals(time.format(currentDateTime))) {
-            clock();
-        }
-
-    } // end clock()
-
-    String json;
-
     // Gets current uv levels
-    public String getData() {
-
+    public static String getData() {
+        String json = "";
+        
         try {
 
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -159,6 +135,26 @@ public class Methods {
         } // End for loop
 
         return output;
-        //System.out.println(items);
     } // End getData()
+    
+    // Reads replies from file and stores into ArrayList
+    public static ArrayList<String> readFile(String path) {
+        ArrayList<String> array = new ArrayList<>();
+        try {
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                array.add(line);
+            }
+            br.close();
+
+        } catch (IOException e) {
+            System.out.println("ERROR: unable to read file " + path);
+        }
+        
+        return array;
+    }
+    
 } // End Methods class
