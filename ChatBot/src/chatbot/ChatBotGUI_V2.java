@@ -3,16 +3,10 @@
  */
 package chatbot;
 
-import static chatbot.music.stopped;
-import static chatbot.music.songNo;
-import static chatbot.music.folder;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -638,7 +632,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
     private void stopMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stopMouseReleased
         mc.Stop();
-        stopped = true;
+        mc.stopped = true;
     }//GEN-LAST:event_stopMouseReleased
 
     private void playMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_playMouseReleased
@@ -667,7 +661,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     }//GEN-LAST:event_nextMouseReleased
 
     private void previousMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_previousMouseReleased
-        if (songNo > 0) {
+        if (mc.songNo > 0) {
             mc.Stop();
             mc.prev();
         }
@@ -706,7 +700,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
             ChatBotGUI_V2 frame = new ChatBotGUI_V2();
             frame.setVisible(true);
             // set icon
-            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(System.getProperty("user.dir") + "\\test\\icon.png"));
+            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(System.getProperty("user.dir") + "\\images\\icon.png"));
         });
     }
 
@@ -836,7 +830,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             break;
                         case "mc stop":
                             mc.Stop();
-                            stopped = true;
+                            mc.stopped = true;
                             doc.insertString(doc.getLength(), "Chatbot: Music stopped\n", null);
                             break;
                         case "mc pause":
@@ -849,7 +843,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             doc.insertString(doc.getLength(), "Chatbot: Playing next song\n", null);
                             break;
                         case "mc prev":
-                            if (songNo > 0) {
+                            if (mc.songNo > 0) {
                                 mc.Stop();
                                 mc.prev();
                                 doc.insertString(doc.getLength(), "Chatbot: Playing previous song\n", null);
@@ -863,7 +857,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             } catch (IndexOutOfBoundsException ex) {
                                 JOptionPane.showMessageDialog(null, "Invalid directory", "Error", 0);
                             }
-                            doc.insertString(doc.getLength(), "Chatbot: Music directory choosen " + folder + "\n", null);
+                            doc.insertString(doc.getLength(), "Chatbot: Music directory choosen " + mc.folder + "\n", null);
                             break;
                         case "uv":
                             doc.insertString(doc.getLength(), Methods.getData(), null);
@@ -964,7 +958,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     } // chatbot()
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public static javax.swing.JLabel Display;
+    static javax.swing.JLabel Display;
     private javax.swing.JLabel about;
     private javax.swing.JLabel about1;
     private javax.swing.JLabel about2;
@@ -978,7 +972,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private javax.swing.JLabel chatbot1;
     private javax.swing.JLabel chatbot2;
     private javax.swing.JLabel choose;
-    public static javax.swing.JLabel clock;
+    private javax.swing.JLabel clock;
     private javax.swing.JLabel closeButton;
     private javax.swing.JLabel closeButton1;
     private javax.swing.JLabel displayDate;
@@ -998,7 +992,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     public static javax.swing.JLabel musicStatus;
     private javax.swing.JLabel next;
     public static javax.swing.JLabel notiBar;
-    public static javax.swing.JLabel notiBar1;
+    private javax.swing.JLabel notiBar1;
     public static javax.swing.JLabel notiBar2;
     private javax.swing.JLabel pause;
     private javax.swing.JLabel play;

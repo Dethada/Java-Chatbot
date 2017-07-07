@@ -29,24 +29,28 @@ import javazoom.jl.player.Player;
  */
 public class music {
 
-    public static boolean stopped;
-    public static int songNo;
-    long pauseLocation;
-    long songTotalLength;
-    boolean playing;
-    boolean fileChoosen;
-    String currentSong;
-    String temp;
-    String settingsName = "config.tut";
-    public static Properties prop = new Properties();
+    boolean stopped;
+    int songNo;
+    File folder;
+    
+    private long pauseLocation;
+    private long songTotalLength;
+    private boolean playing;
+    private String currentSong;
+    private final String settingsName;
+    private final Properties prop = new Properties();
+    private FileInputStream FIS;
+    private BufferedInputStream BIS;
+    private final ArrayList<String> songs;
+    private final ArrayList<String> playList;
+    private final Random randomGenerator  = new Random();
+    private Player player;
 
-    FileInputStream FIS;
-    BufferedInputStream BIS;
-    ArrayList<String> songs = new ArrayList<>();
-    Random randomGenerator = new Random();
-    public static File folder;
-    ArrayList<String> playList = new ArrayList<>();
-    Player player;
+    public music() {
+        this.songs = new ArrayList<>();
+        this.playList = new ArrayList<>();
+        this.settingsName = "config.tut";
+    }
 
     public void Stop() {
 
@@ -69,7 +73,6 @@ public class music {
                 pauseLocation = FIS.available();
                 player.close();
             } catch (IOException ex) {
-
             }
         }
     }
@@ -85,10 +88,7 @@ public class music {
 
             songTotalLength = FIS.available();
 
-            Display.setText(currentSong);
-            notiBar.setText(currentSong);
-            notiBar2.setText(currentSong);
-            musicStatus.setText("Playing");
+            setDisplayPlaying();
         } catch (FileNotFoundException | JavaLayerException ex) {
         } catch (IOException ex) {
             Logger.getLogger(music.class.getName()).log(Level.SEVERE, null, ex);
@@ -118,10 +118,7 @@ public class music {
                 restart();
                 stopped = false;
             } else if (!playing) {
-                Display.setText(currentSong);
-                notiBar.setText(currentSong);
-                notiBar2.setText(currentSong);
-                musicStatus.setText("Playing");
+                setDisplayPlaying();
                 try {
                     FIS = new FileInputStream(folder + "\\" + currentSong);
                     BIS = new BufferedInputStream(FIS);
@@ -150,10 +147,7 @@ public class music {
         playing = true;
         songNo++;
         currentSong = playList.get(songNo);
-        Display.setText(currentSong);
-        notiBar.setText(currentSong);
-        notiBar2.setText(currentSong);
-        musicStatus.setText("Playing");
+        setDisplayPlaying();
         pauseLocation = 0;
         Play(folder + "\\" + currentSong);
     }
@@ -162,10 +156,7 @@ public class music {
         playing = true;
         songNo--;
         currentSong = playList.get(songNo);
-        Display.setText(currentSong);
-        notiBar.setText(currentSong);
-        notiBar2.setText(currentSong);
-        musicStatus.setText("Playing");
+        setDisplayPlaying();
         pauseLocation = 0;
         Play(folder + "\\" + currentSong);
     }
@@ -278,6 +269,13 @@ public class music {
         }
 
         return value;
+    }
+    
+    private void setDisplayPlaying() {
+        Display.setText(currentSong);
+        notiBar.setText(currentSong);
+        notiBar2.setText(currentSong);
+        musicStatus.setText("Playing");
     }
 
 }
