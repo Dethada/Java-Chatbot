@@ -22,5 +22,5 @@ A kind of useful chabot
 * Fix autoscroll
 * Add more convo starters
 * Fix last song problem
-* Convert Methods class methods to static
-* Store all replies to txt file
+* Add more replies
+* Optimize code
