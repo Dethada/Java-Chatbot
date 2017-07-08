@@ -54,7 +54,7 @@ public class Methods {
     // Gets current uv levels
     public static String getData() {
         String json = "";
-        
+
         try {
 
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -136,7 +136,7 @@ public class Methods {
 
         return output;
     } // End getData()
-    
+
     // Reads replies from file and stores into ArrayList
     public static ArrayList<String> readFile(String path) {
         ArrayList<String> array = new ArrayList<>();
@@ -153,8 +153,18 @@ public class Methods {
         } catch (IOException e) {
             System.out.println("ERROR: unable to read file " + path);
         }
-        
+
         return array;
     }
-    
+
+    // Switches panels
+    public static void changePanel(javax.swing.JPanel mainPanel, javax.swing.JPanel panel) {
+        mainPanel.removeAll();
+        mainPanel.repaint();
+        mainPanel.revalidate();
+
+        mainPanel.add(panel);
+        mainPanel.repaint();
+        mainPanel.revalidate();
+    }
 } // End Methods class

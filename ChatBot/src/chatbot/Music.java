@@ -4,8 +4,6 @@
 package chatbot;
 
 import static chatbot.ChatBotGUI_V2.Display;
-import static chatbot.ChatBotGUI_V2.notiBar;
-import static chatbot.ChatBotGUI_V2.notiBar2;
 import static chatbot.ChatBotGUI_V2.musicStatus;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -22,12 +20,14 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
+import static chatbot.ChatBotGUI_V2.notiBarChat;
+import static chatbot.ChatBotGUI_V2.notiBarAbout;
 
 /**
  *
  * @author David
  */
-public class music {
+public class Music {
 
     boolean stopped;
     int songNo;
@@ -46,7 +46,7 @@ public class music {
     private final Random randomGenerator  = new Random();
     private Player player;
 
-    public music() {
+    public Music() {
         this.songs = new ArrayList<>();
         this.playList = new ArrayList<>();
         this.settingsName = "config.tut";
@@ -59,8 +59,8 @@ public class music {
             playing = false;
 
             Display.setText("Open your music folder to play songs");
-            notiBar.setText("Remeber to key in your ATS!");
-            notiBar2.setText("Remeber to key in your ATS!");
+            notiBarChat.setText("Remeber to key in your ATS!");
+            notiBarAbout.setText("Remeber to key in your ATS!");
             musicStatus.setText("Stopped");
         }
     }
@@ -91,7 +91,7 @@ public class music {
             setDisplayPlaying();
         } catch (FileNotFoundException | JavaLayerException ex) {
         } catch (IOException ex) {
-            Logger.getLogger(music.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Music.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         new Thread() {
@@ -273,9 +273,9 @@ public class music {
     
     private void setDisplayPlaying() {
         Display.setText(currentSong);
-        notiBar.setText(currentSong);
-        notiBar2.setText(currentSong);
+        notiBarChat.setText(currentSong);
+        notiBarAbout.setText(currentSong);
         musicStatus.setText("Playing");
     }
 
-}
+} // End Music class

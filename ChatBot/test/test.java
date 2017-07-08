@@ -1,7 +1,4 @@
 
-import java.util.Random;
-
-
 
 /**
  *
@@ -10,9 +7,6 @@ import java.util.Random;
 public class test {
 
     public static void main(String[] args) {
-        Random randomnum = new Random();
-        for (int i = 0; i <= 20; i++) {
-            System.out.println(randomnum.nextInt(1001) + 500);
-        }
+        System.out.println(System.getProperty("user.dir") + "\\src\\images\\icon.png");
     }
-}
+} // End test class

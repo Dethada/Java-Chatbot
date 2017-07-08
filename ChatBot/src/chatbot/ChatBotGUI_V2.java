@@ -27,30 +27,45 @@ import javax.swing.text.StyledDocument;
  */
 public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
-    music mc = new music();
-
     /**
      * Creates new form ChatBotGUI_V2
      */
-    // For proper frame drag
-    int xMouse;
-    int yMouse;
-
+    private final Music mc;
+    private final Music mcAlarm;
     // for alarm clock
-    String currentTime;
-    String alarmTime = "";
-
+    private String currentTime;
+    private String alarmTime;
     // inputs
-    String input;
-    String lowerCaseInput;
+    private String input;
+    private String lowerCaseInput;
+    // For font color
+    private final StyledDocument doc;
+    private final Style style;
+    // Replies
+    private final ArrayList<String> greetings;
+    private final ArrayList<String> jokes;
+    private final ArrayList<String> goodbye;
+    private final ArrayList<String> defaultReply;
+    // RNG
+    private final Random randomGenerator;
 
     public ChatBotGUI_V2() {
+        this.alarmTime = "";
+        this.randomGenerator = new Random();
+        this.mc = new Music();
+        this.mcAlarm = new Music();
         initComponents();
 
         // Set font color
-        StyledDocument doc = chatArea.getStyledDocument();
-        Style style = chatArea.addStyle("This is a style", null);
+        doc = chatArea.getStyledDocument();
+        style = chatArea.addStyle("This is a style", null);
         StyleConstants.setForeground(style, Color.ORANGE);
+
+        // Read stored replies from file
+        greetings = Methods.readFile(System.getProperty("user.dir") + "\\replies\\greetings.txt");
+        jokes = Methods.readFile(System.getProperty("user.dir") + "\\replies\\jokes.txt");
+        goodbye = Methods.readFile(System.getProperty("user.dir") + "\\replies\\goodbye.txt");
+        defaultReply = Methods.readFile(System.getProperty("user.dir") + "\\replies\\default.txt");
 
         if (mc.getProp("fileChoosen").equals("yes")) {
             Display.setText("Click the three dots to start");
@@ -93,11 +108,11 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     } catch (BadLocationException ex) {
                         Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    mc.Stop();
-                    mc.Play(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
+                    mc.Pause();
+                    mcAlarm.Play(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
                     Display.setText("Alarm ringing");
-                    notiBar.setText("Alarm ringing");
-                    notiBar2.setText("Alarm ringing");
+                    notiBarChat.setText("Alarm ringing");
+                    notiBarAbout.setText("Alarm ringing");
                     musicStatus.setText("Alarm ringing");
                 }
 
@@ -120,15 +135,13 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         mainPanel = new javax.swing.JPanel();
         homePanel = new javax.swing.JPanel();
-        notiBar1 = new javax.swing.JLabel();
-        miniButton1 = new javax.swing.JLabel();
-        closeButton1 = new javax.swing.JLabel();
-        dragFrame1 = new javax.swing.JLabel();
-        home1 = new javax.swing.JLabel();
-        chatbot1 = new javax.swing.JLabel();
+        snoozeHome = new javax.swing.JLabel();
+        notiBarHome = new javax.swing.JLabel();
+        homeButtonHome = new javax.swing.JLabel();
+        chatButtonHome = new javax.swing.JLabel();
         displayDate = new javax.swing.JLabel();
         clock = new javax.swing.JLabel();
-        about1 = new javax.swing.JLabel();
+        aboutButtonHome = new javax.swing.JLabel();
         play = new javax.swing.JLabel();
         pause = new javax.swing.JLabel();
         stop = new javax.swing.JLabel();
@@ -137,35 +150,33 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         previous = new javax.swing.JLabel();
         choose = new javax.swing.JLabel();
         musicStatus = new javax.swing.JLabel();
-        background1 = new javax.swing.JLabel();
+        backgroundHome = new javax.swing.JLabel();
         chatPanel = new javax.swing.JPanel();
-        notiBar = new javax.swing.JLabel();
-        miniButton = new javax.swing.JLabel();
-        closeButton = new javax.swing.JLabel();
+        snoozeChat = new javax.swing.JLabel();
+        notiBarChat = new javax.swing.JLabel();
         inputField = new javax.swing.JTextField();
         sendButton = new javax.swing.JButton();
-        dragFrame = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        ScrollPane = new javax.swing.JScrollPane();
         chatArea = new javax.swing.JTextPane();
-        home = new javax.swing.JLabel();
-        chatbot = new javax.swing.JLabel();
-        about = new javax.swing.JLabel();
+        homeButtonChat = new javax.swing.JLabel();
+        chatButtonChat = new javax.swing.JLabel();
+        aboutButtonChat = new javax.swing.JLabel();
         typingStatus = new javax.swing.JLabel();
-        background = new javax.swing.JLabel();
+        backgroundChat = new javax.swing.JLabel();
         aboutPanel = new javax.swing.JPanel();
-        notiBar2 = new javax.swing.JLabel();
-        home2 = new javax.swing.JLabel();
-        chatbot2 = new javax.swing.JLabel();
-        about2 = new javax.swing.JLabel();
+        snoozeAbout = new javax.swing.JLabel();
+        notiBarAbout = new javax.swing.JLabel();
+        homeButtonAbout = new javax.swing.JLabel();
+        chatButtonAbout = new javax.swing.JLabel();
+        aboutButtonAbout = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        background2 = new javax.swing.JLabel();
+        backgroundAbout = new javax.swing.JLabel();
 
         jLabel2.setText("jLabel2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Project Chatbot");
         setMinimumSize(new java.awt.Dimension(1365, 763));
-        setPreferredSize(new java.awt.Dimension(1365, 763));
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -176,58 +187,30 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
         homePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        notiBar1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        notiBar1.setForeground(new java.awt.Color(0, 204, 204));
-        notiBar1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        notiBar1.setText("Remember to key in your ATS!");
-        homePanel.add(notiBar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 14, 1030, 20));
-
-        miniButton1.setToolTipText("Minimise");
-        miniButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        miniButton1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                miniButton1MouseClicked(evt);
-            }
-        });
-        homePanel.add(miniButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1267, 11, 40, 40));
-
-        closeButton1.setToolTipText("Close");
-        closeButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        closeButton1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                closeButton1MouseClicked(evt);
-            }
-        });
-        homePanel.add(closeButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1319, 10, 40, 40));
-
-        dragFrame1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        dragFrame1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                dragFrame1MouseDragged(evt);
-            }
-        });
-        dragFrame1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                dragFrame1MousePressed(evt);
-            }
-        });
-        homePanel.add(dragFrame1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 40));
-
-        home1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        home1.addMouseListener(new java.awt.event.MouseAdapter() {
+        snoozeHome.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        snoozeHome.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                home1MouseReleased(evt);
+                snoozeHomeMouseReleased(evt);
             }
         });
-        homePanel.add(home1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, 50));
+        homePanel.add(snoozeHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(1285, 0, 65, 65));
 
-        chatbot1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        chatbot1.addMouseListener(new java.awt.event.MouseAdapter() {
+        notiBarHome.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        notiBarHome.setForeground(new java.awt.Color(0, 204, 204));
+        notiBarHome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        notiBarHome.setText("Remember to key in your ATS!");
+        homePanel.add(notiBarHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 14, 1030, 20));
+
+        homeButtonHome.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        homePanel.add(homeButtonHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, 50));
+
+        chatButtonHome.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        chatButtonHome.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                chatbot1MouseReleased(evt);
+                chatButtonHomeMouseReleased(evt);
             }
         });
-        homePanel.add(chatbot1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 164, 170, 50));
+        homePanel.add(chatButtonHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 161, 170, 50));
 
         displayDate.setFont(new java.awt.Font("DS-Digital", 0, 50)); // NOI18N
         displayDate.setForeground(new java.awt.Color(255, 255, 255));
@@ -241,13 +224,13 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         clock.setText("6:23:25 PM");
         homePanel.add(clock, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 1070, 310));
 
-        about1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        about1.addMouseListener(new java.awt.event.MouseAdapter() {
+        aboutButtonHome.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        aboutButtonHome.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                about1MouseReleased(evt);
+                aboutButtonHomeMouseReleased(evt);
             }
         });
-        homePanel.add(about1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 380, 160, 50));
+        homePanel.add(aboutButtonHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 238, 160, 50));
 
         play.setToolTipText("Play");
         play.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -314,11 +297,11 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         musicStatus.setText("Not playing");
         homePanel.add(musicStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 610, 170, -1));
 
-        background1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chatbot/chatbothome.png"))); // NOI18N
-        background1.setMaximumSize(new java.awt.Dimension(10, 10));
-        background1.setMinimumSize(new java.awt.Dimension(10, 10));
-        background1.setPreferredSize(new java.awt.Dimension(10, 10));
-        homePanel.add(background1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -350, 1820, 1460));
+        backgroundHome.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/chatbotbgHome.png"))); // NOI18N
+        backgroundHome.setMaximumSize(new java.awt.Dimension(10, 10));
+        backgroundHome.setMinimumSize(new java.awt.Dimension(10, 10));
+        backgroundHome.setPreferredSize(new java.awt.Dimension(10, 10));
+        homePanel.add(backgroundHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -350, 1820, 1460));
 
         mainPanel.add(homePanel, "card3");
 
@@ -327,29 +310,19 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         chatPanel.setPreferredSize(new java.awt.Dimension(1365, 763));
         chatPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        notiBar.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
-        notiBar.setForeground(new java.awt.Color(0, 204, 204));
-        notiBar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        notiBar.setText("Remember to key in your ATS!");
-        chatPanel.add(notiBar, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 14, 1030, 20));
-
-        miniButton.setToolTipText("Minimise");
-        miniButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        miniButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                miniButtonMouseClicked(evt);
+        snoozeChat.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        snoozeChat.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                snoozeChatMouseReleased(evt);
             }
         });
-        chatPanel.add(miniButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1267, 11, 40, 40));
+        chatPanel.add(snoozeChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(1285, 0, 65, 65));
 
-        closeButton.setToolTipText("Close");
-        closeButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        closeButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                closeButtonMouseClicked(evt);
-            }
-        });
-        chatPanel.add(closeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1319, 10, 40, 40));
+        notiBarChat.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        notiBarChat.setForeground(new java.awt.Color(0, 204, 204));
+        notiBarChat.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        notiBarChat.setText("Remember to key in your ATS!");
+        chatPanel.add(notiBarChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 14, 1030, 20));
 
         inputField.setBackground(new java.awt.Color(4, 4, 4));
         inputField.setFont(new java.awt.Font("SansSerif", 0, 28)); // NOI18N
@@ -365,7 +338,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         chatPanel.add(inputField, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 630, 990, 50));
 
         sendButton.setBackground(new java.awt.Color(105, 105, 105));
-        sendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chatbot/Chat-48.png"))); // NOI18N
+        sendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Chat-48.png"))); // NOI18N
         sendButton.setToolTipText("Click to send");
         sendButton.setOpaque(false);
         sendButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -373,32 +346,14 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 sendButtonMouseClicked(evt);
             }
         });
-        sendButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sendButtonActionPerformed(evt);
-            }
-        });
         chatPanel.add(sendButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 630, 90, 50));
 
-        dragFrame.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        dragFrame.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                dragFrameMouseDragged(evt);
-            }
-        });
-        dragFrame.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                dragFrameMousePressed(evt);
-            }
-        });
-        chatPanel.add(dragFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 40));
-
-        jScrollPane2.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(0, 204, 204)));
-        jScrollPane2.setAutoscrolls(true);
-        jScrollPane2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jScrollPane2.setFocusable(false);
-        jScrollPane2.setNextFocusableComponent(inputField);
-        jScrollPane2.setRequestFocusEnabled(false);
+        ScrollPane.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(0, 204, 204)));
+        ScrollPane.setAutoscrolls(true);
+        ScrollPane.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        ScrollPane.setFocusable(false);
+        ScrollPane.setNextFocusableComponent(inputField);
+        ScrollPane.setRequestFocusEnabled(false);
 
         chatArea.setEditable(false);
         chatArea.setBackground(new java.awt.Color(4, 4, 4));
@@ -408,85 +363,88 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         chatArea.setFocusCycleRoot(false);
         chatArea.setFocusable(false);
         chatArea.setRequestFocusEnabled(false);
-        jScrollPane2.setViewportView(chatArea);
+        ScrollPane.setViewportView(chatArea);
 
-        chatPanel.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 90, 1090, 460));
+        chatPanel.add(ScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 90, 1090, 460));
 
-        home.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        home.addMouseListener(new java.awt.event.MouseAdapter() {
+        homeButtonChat.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        homeButtonChat.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                homeMouseReleased(evt);
+                homeButtonChatMouseReleased(evt);
             }
         });
-        chatPanel.add(home, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, 50));
+        chatPanel.add(homeButtonChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, 50));
 
-        chatbot.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        chatbot.addMouseListener(new java.awt.event.MouseAdapter() {
+        chatButtonChat.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        chatPanel.add(chatButtonChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 161, 170, 50));
+
+        aboutButtonChat.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        aboutButtonChat.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                chatbotMouseReleased(evt);
+                aboutButtonChatMouseReleased(evt);
             }
         });
-        chatPanel.add(chatbot, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 164, 170, 50));
-
-        about.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        about.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                aboutMouseReleased(evt);
-            }
-        });
-        chatPanel.add(about, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 380, 160, 50));
+        chatPanel.add(aboutButtonChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 238, 160, 50));
 
         typingStatus.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         typingStatus.setForeground(new java.awt.Color(70, 173, 212));
         typingStatus.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         chatPanel.add(typingStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 550, 280, 60));
 
-        background.setForeground(new java.awt.Color(255, 255, 255));
-        background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chatbot/chatbotbgV2.png"))); // NOI18N
-        background.setMaximumSize(new java.awt.Dimension(10, 10));
-        background.setMinimumSize(new java.awt.Dimension(10, 10));
-        background.setPreferredSize(new java.awt.Dimension(10, 10));
-        chatPanel.add(background, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -350, 1820, 1460));
+        backgroundChat.setForeground(new java.awt.Color(255, 255, 255));
+        backgroundChat.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/chatbotbg.png"))); // NOI18N
+        backgroundChat.setMaximumSize(new java.awt.Dimension(10, 10));
+        backgroundChat.setMinimumSize(new java.awt.Dimension(10, 10));
+        backgroundChat.setPreferredSize(new java.awt.Dimension(10, 10));
+        chatPanel.add(backgroundChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -350, 1820, 1460));
 
         mainPanel.add(chatPanel, "card2");
 
         aboutPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        notiBar2.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
-        notiBar2.setForeground(new java.awt.Color(0, 204, 204));
-        notiBar2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        notiBar2.setText("Remember to key in your ATS!");
-        aboutPanel.add(notiBar2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 14, 1030, 20));
-
-        home2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        home2.addMouseListener(new java.awt.event.MouseAdapter() {
+        snoozeAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        snoozeAbout.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                home2MouseReleased(evt);
+                snoozeAboutMouseReleased(evt);
             }
         });
-        aboutPanel.add(home2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, 50));
+        aboutPanel.add(snoozeAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(1285, 0, 65, 65));
 
-        chatbot2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        chatbot2.addMouseListener(new java.awt.event.MouseAdapter() {
+        notiBarAbout.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        notiBarAbout.setForeground(new java.awt.Color(0, 204, 204));
+        notiBarAbout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        notiBarAbout.setText("Remember to key in your ATS!");
+        aboutPanel.add(notiBarAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 14, 1030, 20));
+
+        homeButtonAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        homeButtonAbout.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                chatbot2MouseReleased(evt);
+                homeButtonAboutMouseReleased(evt);
             }
         });
-        aboutPanel.add(chatbot2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 164, 170, 50));
+        aboutPanel.add(homeButtonAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, 50));
 
-        about2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        aboutPanel.add(about2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 380, 160, 50));
+        chatButtonAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        chatButtonAbout.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                chatButtonAboutMouseReleased(evt);
+            }
+        });
+        aboutPanel.add(chatButtonAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 161, 170, 50));
+
+        aboutButtonAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        aboutPanel.add(aboutButtonAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 238, 170, 50));
 
         jLabel1.setFont(new java.awt.Font("SansSerif", 0, 48)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Developer Information & Credits");
         aboutPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 60, 700, 90));
 
-        background2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chatbot/chatbotbgV2.png"))); // NOI18N
-        background2.setMaximumSize(new java.awt.Dimension(10, 10));
-        background2.setMinimumSize(new java.awt.Dimension(10, 10));
-        background2.setPreferredSize(new java.awt.Dimension(10, 10));
-        aboutPanel.add(background2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -350, 1820, 1460));
+        backgroundAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/chatbotbg.png"))); // NOI18N
+        backgroundAbout.setMaximumSize(new java.awt.Dimension(10, 10));
+        backgroundAbout.setMinimumSize(new java.awt.Dimension(10, 10));
+        backgroundAbout.setPreferredSize(new java.awt.Dimension(10, 10));
+        aboutPanel.add(backgroundAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -350, 1820, 1460));
 
         mainPanel.add(aboutPanel, "card4");
 
@@ -495,26 +453,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void closeButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_closeButtonMouseClicked
-        System.exit(0);
-    }//GEN-LAST:event_closeButtonMouseClicked
-
-    private void miniButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_miniButtonMouseClicked
-        this.setState(ChatBotGUI_V2.ICONIFIED);
-    }//GEN-LAST:event_miniButtonMouseClicked
-
-    private void dragFrameMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dragFrameMouseDragged
-        int x = evt.getXOnScreen();
-        int y = evt.getYOnScreen();
-
-        this.setLocation(x - xMouse, y - yMouse);
-    }//GEN-LAST:event_dragFrameMouseDragged
-
-    private void dragFrameMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dragFrameMousePressed
-        xMouse = evt.getX();
-        yMouse = evt.getY();
-    }//GEN-LAST:event_dragFrameMousePressed
 
     private void sendButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sendButtonMouseClicked
         inputFunction();
@@ -526,109 +464,29 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_inputFieldKeyPressed
 
-    private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendButtonActionPerformed
-        // Leave blank
-    }//GEN-LAST:event_sendButtonActionPerformed
+    private void homeButtonChatMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homeButtonChatMouseReleased
+        Methods.changePanel(mainPanel, homePanel);
+    }//GEN-LAST:event_homeButtonChatMouseReleased
 
-    private void miniButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_miniButton1MouseClicked
-        this.setState(ChatBotGUI_V2.ICONIFIED);
-    }//GEN-LAST:event_miniButton1MouseClicked
+    private void chatButtonHomeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chatButtonHomeMouseReleased
+        Methods.changePanel(mainPanel, chatPanel);
+    }//GEN-LAST:event_chatButtonHomeMouseReleased
 
-    private void closeButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_closeButton1MouseClicked
-        System.exit(0);
-    }//GEN-LAST:event_closeButton1MouseClicked
+    private void homeButtonAboutMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homeButtonAboutMouseReleased
+        Methods.changePanel(mainPanel, homePanel);
+    }//GEN-LAST:event_homeButtonAboutMouseReleased
 
-    private void dragFrame1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dragFrame1MouseDragged
-        int x = evt.getXOnScreen();
-        int y = evt.getYOnScreen();
+    private void chatButtonAboutMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chatButtonAboutMouseReleased
+        Methods.changePanel(mainPanel, chatPanel);
+    }//GEN-LAST:event_chatButtonAboutMouseReleased
 
-        this.setLocation(x - xMouse, y - yMouse);
-    }//GEN-LAST:event_dragFrame1MouseDragged
+    private void aboutButtonHomeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_aboutButtonHomeMouseReleased
+        Methods.changePanel(mainPanel, aboutPanel);
+    }//GEN-LAST:event_aboutButtonHomeMouseReleased
 
-    private void dragFrame1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dragFrame1MousePressed
-        xMouse = evt.getX();
-        yMouse = evt.getY();
-    }//GEN-LAST:event_dragFrame1MousePressed
-
-    private void homeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homeMouseReleased
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(homePanel);
-        mainPanel.repaint();
-        mainPanel.revalidate();
-    }//GEN-LAST:event_homeMouseReleased
-
-    private void chatbotMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chatbotMouseReleased
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(chatPanel);
-        mainPanel.repaint();
-        mainPanel.revalidate();
-    }//GEN-LAST:event_chatbotMouseReleased
-
-    private void chatbot1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chatbot1MouseReleased
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(chatPanel);
-        mainPanel.repaint();
-        mainPanel.revalidate();
-    }//GEN-LAST:event_chatbot1MouseReleased
-
-    private void home1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_home1MouseReleased
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(homePanel);
-        mainPanel.repaint();
-        mainPanel.revalidate();
-    }//GEN-LAST:event_home1MouseReleased
-
-    private void home2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_home2MouseReleased
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(homePanel);
-        mainPanel.repaint();
-        mainPanel.revalidate();
-    }//GEN-LAST:event_home2MouseReleased
-
-    private void chatbot2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chatbot2MouseReleased
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(chatPanel);
-        mainPanel.repaint();
-        mainPanel.revalidate();
-    }//GEN-LAST:event_chatbot2MouseReleased
-
-    private void about1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_about1MouseReleased
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(aboutPanel);
-        mainPanel.repaint();
-        mainPanel.revalidate();
-    }//GEN-LAST:event_about1MouseReleased
-
-    private void aboutMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_aboutMouseReleased
-        mainPanel.removeAll();
-        mainPanel.repaint();
-        mainPanel.revalidate();
-
-        mainPanel.add(aboutPanel);
-        mainPanel.repaint();
-        mainPanel.revalidate();
-    }//GEN-LAST:event_aboutMouseReleased
+    private void aboutButtonChatMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_aboutButtonChatMouseReleased
+        Methods.changePanel(mainPanel, aboutPanel);
+    }//GEN-LAST:event_aboutButtonChatMouseReleased
 
     private void stopMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stopMouseReleased
         mc.Stop();
@@ -667,6 +525,36 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_previousMouseReleased
 
+    private void snoozeHomeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_snoozeHomeMouseReleased
+        if (!alarmTime.equals("")) {
+            JOptionPane.showMessageDialog(null, "Alarm dismissed");
+        } else {
+            JOptionPane.showMessageDialog(null, "No alarms to dismiss");
+        }
+        mcAlarm.Stop();
+        alarmTime = "";
+    }//GEN-LAST:event_snoozeHomeMouseReleased
+
+    private void snoozeChatMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_snoozeChatMouseReleased
+        if (!alarmTime.equals("")) {
+            JOptionPane.showMessageDialog(null, "Alarm dismissed");
+        } else {
+            JOptionPane.showMessageDialog(null, "No alarms to dismiss");
+        }
+        mcAlarm.Stop();
+        alarmTime = "";
+    }//GEN-LAST:event_snoozeChatMouseReleased
+
+    private void snoozeAboutMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_snoozeAboutMouseReleased
+        if (!alarmTime.equals("")) {
+            JOptionPane.showMessageDialog(null, "Alarm dismissed");
+        } else {
+            JOptionPane.showMessageDialog(null, "No alarms to dismiss");
+        }
+        mcAlarm.Stop();
+        alarmTime = "";
+    }//GEN-LAST:event_snoozeAboutMouseReleased
+
     /**
      * @param args the command line arguments
      */
@@ -700,24 +588,24 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
             ChatBotGUI_V2 frame = new ChatBotGUI_V2();
             frame.setVisible(true);
             // set icon
-            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(System.getProperty("user.dir") + "\\images\\icon.png"));
+            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(System.getProperty("user.dir") + "\\src\\images\\icon.png"));
         });
     }
 
+    // handles user input
     private void inputFunction() {
         try {
             StyledDocument doc = chatArea.getStyledDocument();
             Style style = chatArea.addStyle("I'm a style", null);
             StyleConstants.setForeground(style, Color.ORANGE);
-            
+
             // Get input
             input = inputField.getText();
             lowerCaseInput = input.toLowerCase();
-            
+
             // Display input
             doc.insertString(doc.getLength(), "You: " + input + "\n", style);
-            
-            
+
             if (lowerCaseInput.contains("set alarm")) {
                 alarmTime = input.substring(10);
                 doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + alarmTime + "\n", null);
@@ -737,7 +625,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
+
             // clear input text field
             inputField.setText("");
             inputField.requestFocus();
@@ -746,36 +634,13 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         }
     }
 
+    // chats with the user
     private void chatbot() throws InterruptedException, BadLocationException {
-        // file paths
-        String pathGreetings = System.getProperty("user.dir") + "\\replies\\greetings.txt";
-        String pathJokes = System.getProperty("user.dir") + "\\replies\\jokes.txt";
-        String pathGoodbye = System.getProperty("user.dir") + "\\replies\\goodbye.txt";
-        String pathDefault = System.getProperty("user.dir") + "\\replies\\default.txt";
-
-        // Initialize the objects
-        Random randomGenerator = new Random();
-        StyledDocument doc = chatArea.getStyledDocument();
-        Style style = chatArea.addStyle("I'm a style", null);
-        StyleConstants.setForeground(style, Color.ORANGE);
-        DateTimeFormatter date = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
-        DateTimeFormatter time = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        
-        // Read stored replies from file
-        ArrayList<String> greetings = Methods.readFile(pathGreetings);
-        ArrayList<String> jokes = Methods.readFile(pathJokes);
-        ArrayList<String> goodbye = Methods.readFile(pathGoodbye);
-        ArrayList<String> defaultReply = Methods.readFile(pathDefault);
-
-        // Replies
+        // Help msg
         String help = "Bot:    Commands avaliable\n"
                 + "----------------------------------------------------\n"
                 + "help\t\t\t\t\t\t- Displays this message\n"
                 + "clear\t\t\t\t\t\t- Clears the screen\n"
-                + "date time\t\t\t\t\t- Shows the current date and time\n"
-                + "date\t\t\t\t\t\t- Shows today's date\n"
-                + "time\t\t\t\t\t\t- Shows the current time\n"
                 + "encode\t\t\t\t\t- Converts decimal number to bnary/hex\n"
                 + "decode <bin/hex> <base>\t\t- Converts a binnary/hex to decimal\n"
                 + "coin flip\t\t\t\t\t- Flips a coin\n"
@@ -808,18 +673,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             break;
                         case "help":
                             doc.insertString(doc.getLength(), help, null);
-                            break;
-                        case "date time":
-                        case "date and time":
-                            doc.insertString(doc.getLength(), "Chatbot: Today is " + date.format(currentDateTime) + " and the time now is " + time.format(currentDateTime) + "\n", null);
-                            break;
-                        case "date":
-                        case "what is the date":
-                            doc.insertString(doc.getLength(), "Chatbot: Today is " + date.format(currentDateTime) + "\n", null);
-                            break;
-                        case "time":
-                        case "what is the time now":
-                            doc.insertString(doc.getLength(), "Chatbot: The time now is " + time.format(currentDateTime) + "\n", null);
                             break;
                         case "coin flip":
                             doc.insertString(doc.getLength(), "Chatbot: " + Methods.coinFlip() + "\n", null);
@@ -870,9 +723,13 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             }
                             break;
                         case "dismiss alarm":
-                            mc.Stop();
+                            mcAlarm.Stop();
                             alarmTime = "";
-                            doc.insertString(doc.getLength(), "Chatbot: Alarm dismissed\n", null);
+                            if (alarmTime.equals("")) {
+                                doc.insertString(doc.getLength(), "Chatbot: No alarms to dismiss\n", null);
+                            } else {
+                                doc.insertString(doc.getLength(), "Chatbot: Alarm dismissed\n", null);
+                            }
                             break;
                         case "change dir":
                             mc.changeDir();
@@ -959,45 +816,42 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     static javax.swing.JLabel Display;
-    private javax.swing.JLabel about;
-    private javax.swing.JLabel about1;
-    private javax.swing.JLabel about2;
+    private javax.swing.JScrollPane ScrollPane;
+    private javax.swing.JLabel aboutButtonAbout;
+    private javax.swing.JLabel aboutButtonChat;
+    private javax.swing.JLabel aboutButtonHome;
     private javax.swing.JPanel aboutPanel;
-    private javax.swing.JLabel background;
-    private javax.swing.JLabel background1;
-    private javax.swing.JLabel background2;
+    private javax.swing.JLabel backgroundAbout;
+    private javax.swing.JLabel backgroundChat;
+    private javax.swing.JLabel backgroundHome;
     private javax.swing.JTextPane chatArea;
+    private javax.swing.JLabel chatButtonAbout;
+    private javax.swing.JLabel chatButtonChat;
+    private javax.swing.JLabel chatButtonHome;
     private javax.swing.JPanel chatPanel;
-    private javax.swing.JLabel chatbot;
-    private javax.swing.JLabel chatbot1;
-    private javax.swing.JLabel chatbot2;
     private javax.swing.JLabel choose;
     private javax.swing.JLabel clock;
-    private javax.swing.JLabel closeButton;
-    private javax.swing.JLabel closeButton1;
     private javax.swing.JLabel displayDate;
-    private javax.swing.JLabel dragFrame;
-    private javax.swing.JLabel dragFrame1;
-    private javax.swing.JLabel home;
-    private javax.swing.JLabel home1;
-    private javax.swing.JLabel home2;
+    private javax.swing.JLabel homeButtonAbout;
+    private javax.swing.JLabel homeButtonChat;
+    private javax.swing.JLabel homeButtonHome;
     private javax.swing.JPanel homePanel;
     private javax.swing.JTextField inputField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel mainPanel;
-    private javax.swing.JLabel miniButton;
-    private javax.swing.JLabel miniButton1;
-    public static javax.swing.JLabel musicStatus;
+    static javax.swing.JLabel musicStatus;
     private javax.swing.JLabel next;
-    public static javax.swing.JLabel notiBar;
-    private javax.swing.JLabel notiBar1;
-    public static javax.swing.JLabel notiBar2;
+    static javax.swing.JLabel notiBarAbout;
+    static javax.swing.JLabel notiBarChat;
+    private javax.swing.JLabel notiBarHome;
     private javax.swing.JLabel pause;
     private javax.swing.JLabel play;
     private javax.swing.JLabel previous;
     private javax.swing.JButton sendButton;
+    private javax.swing.JLabel snoozeAbout;
+    private javax.swing.JLabel snoozeChat;
+    private javax.swing.JLabel snoozeHome;
     private javax.swing.JLabel stop;
     private javax.swing.JLabel typingStatus;
     // End of variables declaration//GEN-END:variables
