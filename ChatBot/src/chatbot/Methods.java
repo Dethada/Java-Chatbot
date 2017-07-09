@@ -67,8 +67,7 @@ public class Methods {
                 return "Chatbot: received HTTP error code : " + response.getStatusLine().getStatusCode();
             }
 
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader((response.getEntity().getContent())));
+            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
 
             String output;
             while ((output = br.readLine()) != null) {
@@ -79,13 +78,8 @@ public class Methods {
             httpClient.getConnectionManager().shutdown();
 
         } catch (ClientProtocolException e) {
-
-            e.printStackTrace();
             return "Chatbot: check your internet connection\n";
-
         } catch (IOException e) {
-
-            e.printStackTrace();
             return "Chatbot: check your internet connection\n";
         }
 

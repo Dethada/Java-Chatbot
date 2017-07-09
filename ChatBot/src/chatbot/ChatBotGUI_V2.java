@@ -33,6 +33,10 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private final Music mc;
     private final Music mcAlarm;
     // for alarm clock
+    DateTimeFormatter date;
+    DateTimeFormatter time;
+    LocalDateTime currentDateTime;
+    String currentDate;
     private String currentTime;
     private String alarmTime;
     // inputs
@@ -54,6 +58,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         this.randomGenerator = new Random();
         this.mc = new Music();
         this.mcAlarm = new Music();
+        this.date = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
+        this.time = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
         initComponents();
 
         // Set font color
@@ -80,15 +86,9 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
         // Clock
         new Thread() {
-            DateTimeFormatter date;
-            DateTimeFormatter time;
-            LocalDateTime currentDateTime;
-            String currentDate;
-
             @Override
             public void run() {
-                date = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
-                time = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
+                while(true) {
                 currentDateTime = LocalDateTime.now();
                 currentTime = time.format(currentDateTime);
                 currentDate = date.format(currentDateTime);
@@ -98,7 +98,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
                 try {
                     Thread.sleep(1000);
-                    currentDateTime = LocalDateTime.now();
                 } catch (InterruptedException e) {
                 }
 
@@ -115,11 +114,9 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     notiBarAbout.setText("Alarm ringing");
                     musicStatus.setText("Alarm ringing");
                 }
-
-                if (!currentTime.equals(time.format(currentDateTime))) {
-                    run();
-                }
-            }
+                
+                } // for
+            } // run()
         }.start();
     } // ChatBotGUI_V2()
 
@@ -595,10 +592,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     // handles user input
     private void inputFunction() {
         try {
-            StyledDocument doc = chatArea.getStyledDocument();
-            Style style = chatArea.addStyle("I'm a style", null);
-            StyleConstants.setForeground(style, Color.ORANGE);
-
             // Get input
             input = inputField.getText();
             lowerCaseInput = input.toLowerCase();
@@ -606,6 +599,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
             // Display input
             doc.insertString(doc.getLength(), "You: " + input + "\n", style);
 
+            // Reply
             if (lowerCaseInput.contains("set alarm")) {
                 alarmTime = input.substring(10);
                 doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + alarmTime + "\n", null);
@@ -613,7 +607,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 String value = input.substring(7);
                 doc.insertString(doc.getLength(), "Chatbot: " + Methods.Decimal2Bin(value) + "\n", null);
             } else if (lowerCaseInput.contains("decode")) {
-                // decode 0110 2
                 String v1, v2;
                 v1 = input.substring(7, input.length() - 2);
                 v2 = input.substring(input.length() - 1);
@@ -641,8 +634,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 + "----------------------------------------------------\n"
                 + "help\t\t\t\t\t\t- Displays this message\n"
                 + "clear\t\t\t\t\t\t- Clears the screen\n"
-                + "encode\t\t\t\t\t- Converts decimal number to bnary/hex\n"
-                + "decode <bin/hex> <base>\t\t- Converts a binnary/hex to decimal\n"
+                + "encode\t\t\t\t\t- Converts decimal number to binary/hex\n"
+                + "decode <bin/hex> <base>\t\t- Converts a binary/hex to decimal\n"
                 + "coin flip\t\t\t\t\t- Flips a coin\n"
                 + "joke\t\t\t\t\t\t- Tells a joke\n"
                 + "mc dir\t\t\t\t\t- Choose your music directory\n"
@@ -723,15 +716,15 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             }
                             break;
                         case "dismiss alarm":
-                            mcAlarm.Stop();
-                            alarmTime = "";
                             if (alarmTime.equals("")) {
                                 doc.insertString(doc.getLength(), "Chatbot: No alarms to dismiss\n", null);
                             } else {
                                 doc.insertString(doc.getLength(), "Chatbot: Alarm dismissed\n", null);
                             }
+                            mcAlarm.Stop();
+                            alarmTime = "";
                             break;
-                        case "change dir":
+                        case "mc change dir":
                             mc.changeDir();
                             doc.insertString(doc.getLength(), "Chatbot: Music directory changed\n", null);
                             break;
