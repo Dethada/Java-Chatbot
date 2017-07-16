@@ -507,7 +507,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private void chooseMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chooseMouseReleased
         try {
             mc.chooseDir();
-        } catch (IndexOutOfBoundsException ex) {
+        } catch (IndexOutOfBoundsException | NullPointerException ex) {
             JOptionPane.showMessageDialog(null, "Invalid directory", "Error", 0);
         }
     }//GEN-LAST:event_chooseMouseReleased
@@ -651,7 +651,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         Thread.sleep(randomGenerator.nextInt(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: No problem!\n", null);
-                    } else if (lowerCaseInput.contains("joke")) {
+                    } else if (lowerCaseInput.contains("joke") || lowerCaseInput.contains("cheer me up")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(501) + 500);
                         typingStatus.setText("");
@@ -670,7 +670,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         }.start();
     } // inputFunction()
 
-    // chats with the user
+    // commands
     private void chatbot() {
         // Help msg
         String help = "Bot:    Commands avaliable\n"
@@ -687,6 +687,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 + "mc resume\t\t\t\t\t- Resume the music\n"
                 + "mc next\t\t\t\t\t- Plays the next song\n"
                 + "mc prev\t\t\t\t\t- Plays the previous song\n"
+                + "mc change dir\t\t\t\t- Change music dir"
                 + "alarm\t\t\t\t\t\t- Displays any alarm set\n"
                 + "set alarm 00:00:00 AM/PM\t\t- Set at entered time\n"
                 + "dismiss alarm\t\t\t\t- Dismiss any alarm set\n"
@@ -739,7 +740,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 case "mc dir":
                     try {
                         mc.chooseDir();
-                    } catch (IndexOutOfBoundsException ex) {
+                    } catch (IndexOutOfBoundsException | NullPointerException ex) {
                         JOptionPane.showMessageDialog(null, "Invalid directory", "Error", 0);
                     }
                     doc.insertString(doc.getLength(), "Chatbot: Music directory choosen " + mc.folder + "\n", null);
