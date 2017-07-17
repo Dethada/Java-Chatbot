@@ -355,7 +355,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         ScrollPane.setRequestFocusEnabled(false);
 
         chatArea.setEditable(false);
-        chatArea.setBackground(new java.awt.Color(4, 4, 4));
+        chatArea.setBackground(new java.awt.Color(0, 0, 0));
         chatArea.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         chatArea.setFont(new java.awt.Font("SansSerif", 0, 28)); // NOI18N
         chatArea.setForeground(new java.awt.Color(70, 173, 212));
@@ -507,8 +507,10 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private void chooseMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chooseMouseReleased
         try {
             mc.chooseDir();
-        } catch (IndexOutOfBoundsException | NullPointerException ex) {
-            JOptionPane.showMessageDialog(null, "Invalid directory", "Error", 0);
+        } catch (IndexOutOfBoundsException ex) {
+            JOptionPane.showMessageDialog(null, "No playable files", "Error", 0);
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(null, "No such directory", "Error", 0);
         }
     }//GEN-LAST:event_chooseMouseReleased
 
@@ -740,8 +742,10 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 case "mc dir":
                     try {
                         mc.chooseDir();
-                    } catch (IndexOutOfBoundsException | NullPointerException ex) {
-                        JOptionPane.showMessageDialog(null, "Invalid directory", "Error", 0);
+                    } catch (IndexOutOfBoundsException ex) {
+                        JOptionPane.showMessageDialog(null, "No playable files", "Error", 0);
+                    } catch (NullPointerException ex) {
+                        JOptionPane.showMessageDialog(null, "No such directory", "Error", 0);
                     }
                     doc.insertString(doc.getLength(), "Chatbot: Music directory choosen " + mc.folder + "\n", null);
                     break;

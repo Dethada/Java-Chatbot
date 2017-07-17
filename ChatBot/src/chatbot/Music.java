@@ -162,7 +162,7 @@ public class Music {
     }
 
     // lets first user choose music dir else jus play from the saved dir
-    public void chooseDir() {
+    public void chooseDir() throws IndexOutOfBoundsException, NullPointerException{
         if (!getProp("fileChoosen").equals("yes")) {
             JFileChooser chooser = new JFileChooser("D:\\Media");
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
