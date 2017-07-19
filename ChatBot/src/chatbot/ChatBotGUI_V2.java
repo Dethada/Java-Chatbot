@@ -6,12 +6,18 @@ package chatbot;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,6 +52,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private final StyledDocument doc;
     private final Style style;
     // Replies
+    private HashMap<String, String> qa = null;
     private final ArrayList<String> greetings;
     private final ArrayList<String> jokes;
     private final ArrayList<String> goodbye;
@@ -81,7 +88,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
         // Initiate convo
         try {
-            doc.insertString(doc.getLength(), "Chatbot: Hi nice to meet you I am the third generation chatbot. Type help to show the list of commands available.\n", null);
+            doc.insertString(doc.getLength(), "Chatbot: Hi\ud83d\ude00 nice to meet you I am the third generation chatbot. Type help to show the list of commands available.\n", null);
         } catch (BadLocationException e) {
             System.out.println(e);
         }
@@ -120,6 +127,16 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 } // for
             } // run()
         }.start();
+
+        // Read questions from file
+        try {
+            FileInputStream fileIn = new FileInputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            qa = (HashMap<String, String>) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (IOException | ClassNotFoundException i) {
+        }
     } // ChatBotGUI_V2()
 
     /**
@@ -605,6 +622,34 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
                     // Display input
                     doc.insertString(doc.getLength(), "You: " + input + "\n", style);
+
+                    if (lowerCaseInput.contains("set question")) {
+                        String question = JOptionPane.showInputDialog(null, "Question");
+                        String answer = JOptionPane.showInputDialog(null, "Answer");
+                        qa.put(question, answer);
+                        try {
+                            FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
+                            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                            out.writeObject(qa);
+                            out.close();
+                            fileOut.close();
+                            System.out.println("Serialized data is saved in questions.ser");
+                        } catch (IOException i) {
+                            i.printStackTrace();
+                        }
+                        inputField.setText("");
+                        inputField.requestFocus();
+                        return;
+                    }
+                    for (Map.Entry m : qa.entrySet()) {
+                        String x = "" + m.getKey();
+                        if (input.contains(x)) {
+                            doc.insertString(doc.getLength(), "Chatbot: " + m.getValue() + "\n", null);
+                            inputField.setText("");
+                            inputField.requestFocus();
+                            return;
+                        }
+                    }
 
                     // Reply
                     if (lowerCaseInput.contains("set alarm")) {
