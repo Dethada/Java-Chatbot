@@ -136,6 +136,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
             in.close();
             fileIn.close();
         } catch (IOException | ClassNotFoundException i) {
+            JOptionPane.showMessageDialog(rootPane, "questions.ser might be missing", "Error", 0);
         }
     } // ChatBotGUI_V2()
 
@@ -617,20 +618,36 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 try {
                     // Get input
                     input = inputField.getText();
-                    filteredInput = input.toLowerCase().replaceAll("[^A-Za-z0-9' ]", "");
+                    filteredInput = input.toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
 
                     // Display input
                     doc.insertString(doc.getLength(), "You: " + input + "\n", style);
 
                     // Allow user to add question and answer
-                    if (filteredInput.contains("set question")) {
+                    if (filteredInput.equals("set question")) {
                         Object[] input = {"Question:", questionField, "Answer:", answerField};
 
-                        int option = JOptionPane.showConfirmDialog(null, input, "Set Question", JOptionPane.OK_CANCEL_OPTION);
-                        if (option == JOptionPane.OK_OPTION && !questionField.getText().isEmpty() && !answerField.getText().isEmpty()) {
-                            qa.put(questionField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", ""), answerField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", ""));
-                            questionField.setText("");
-                            answerField.setText("");
+                        int option = JOptionPane.showConfirmDialog(rootPane, input, "Set Question", JOptionPane.OK_CANCEL_OPTION);
+                        if (option == JOptionPane.OK_OPTION) {
+                            String questionText = questionField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
+                            String answerText = answerField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
+                            if (!questionText.isEmpty() && !answerText.isEmpty()) {
+                                qa.put(questionText, answerText);
+                                questionField.setText("");
+                                answerField.setText("");
+                                try {
+                                    FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
+                                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                                    out.writeObject(qa);
+                                    out.close();
+                                    fileOut.close();
+                                    doc.insertString(doc.getLength(), "Chatbot: Question successfully added" + "\n", null);
+                                } catch (IOException i) {
+                                    doc.insertString(doc.getLength(), "Chatbot: IOException Error" + "\n", null);
+                                }
+                            } else {
+                                doc.insertString(doc.getLength(), "Chatbot: Invalid input" + "\n", null);
+                            }
                         } else {
                             doc.insertString(doc.getLength(), "Chatbot: Cancelled" + "\n", null);
                             questionField.setText("");
@@ -638,23 +655,12 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             resetInputField();
                             return;
                         }
-
-                        try {
-                            FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
-                            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                            out.writeObject(qa);
-                            out.close();
-                            fileOut.close();
-                            doc.insertString(doc.getLength(), "Chatbot: Question successfully added" + "\n", null);
-                        } catch (IOException i) {
-                            doc.insertString(doc.getLength(), "Chatbot: IOException" + "\n", null);
-                        }
                         resetInputField();
                         return;
                     }
                     for (Map.Entry question : qa.entrySet()) {
                         String key = "" + question.getKey();
-                        if (input.contains(key)) {
+                        if (input.equals(key)) {
                             doc.insertString(doc.getLength(), "Chatbot: " + question.getValue() + "\n", null);
                             resetInputField();
                             return;
@@ -669,10 +675,22 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         String value = input.substring(7);
                         doc.insertString(doc.getLength(), "Chatbot: " + Methods.Decimal2Bin(value) + "\n", null);
                     } else if (filteredInput.contains("decode")) {
-                        String v1, v2;
-                        v1 = input.substring(7, input.length() - 2);
-                        v2 = input.substring(input.length() - 1);
+                        String v1 = input.substring(7, input.length() - 2);
+                        String v2 = input.substring(input.length() - 1);
                         doc.insertString(doc.getLength(), "Chatbot: " + v1 + " converted to base 10 is " + Methods.decode(v1, v2) + "\n", null);
+                    } else if (filteredInput.contains("remove question")) {
+                        String x = filteredInput.substring(16);
+                        qa.remove(x);
+                        try {
+                            FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
+                            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                            out.writeObject(qa);
+                            out.close();
+                            fileOut.close();
+                            doc.insertString(doc.getLength(), "Chatbot: Question successfully removed" + "\n", null);
+                        } catch (IOException i) {
+                            doc.insertString(doc.getLength(), "Chatbot: IOException Error" + "\n", null);
+                        }
                     } else if (filteredInput.contains("hello") || filteredInput.contains("hi") || filteredInput.contains("sup") || filteredInput.contains("hey") || filteredInput.contains("annyeong")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(251) + 500);
@@ -724,8 +742,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
             }
         }.start();
     } // inputFunction()
-    
-     // clear and reset input text field
+
+    // clear and reset input text field
     private void resetInputField() {
         inputField.setText("");
         inputField.requestFocus();
@@ -734,7 +752,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     // commands
     private void chatbot() {
         // Help msg
-        String help = "Bot:    Commands avaliable\n"
+        String help = "ChatBot:    Commands avaliable\n"
                 + "----------------------------------------------------\n"
                 + "help\t\t\t\t\t\t- Displays this message\n"
                 + "clear\t\t\t\t\t\t- Clears the screen\n"
@@ -770,6 +788,12 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     break;
                 case "coinflip":
                     doc.insertString(doc.getLength(), "Chatbot: " + Methods.coinFlip() + "\n", null);
+                    break;
+                case "list questions":
+                    doc.insertString(doc.getLength(), "List of User added Questions\n----------------------------------------------------\n", null);
+                    for (String s : qa.keySet()) {
+                        doc.insertString(doc.getLength(), s + "\n", null);
+                    }
                     break;
                 case "mc resume":
                     mc.Resume();
