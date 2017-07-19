@@ -47,12 +47,12 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private String alarmTime;
     // inputs
     private String input;
-    private String lowerCaseInput;
+    private String filteredInput;
     // For font color
     private final StyledDocument doc;
     private final Style style;
     // Replies
-    private HashMap<String, String> qa = null;
+    private HashMap<String, String> qa;
     private final ArrayList<String> greetings;
     private final ArrayList<String> jokes;
     private final ArrayList<String> goodbye;
@@ -148,7 +148,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel2 = new javax.swing.JLabel();
+        questionField = new javax.swing.JTextField();
+        answerField = new javax.swing.JTextField();
         mainPanel = new javax.swing.JPanel();
         homePanel = new javax.swing.JPanel();
         snoozeHome = new javax.swing.JLabel();
@@ -185,10 +186,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         homeButtonAbout = new javax.swing.JLabel();
         chatButtonAbout = new javax.swing.JLabel();
         aboutButtonAbout = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        titleLabel = new javax.swing.JLabel();
         backgroundAbout = new javax.swing.JLabel();
-
-        jLabel2.setText("jLabel2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Project Chatbot");
@@ -451,10 +450,10 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         aboutButtonAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         aboutPanel.add(aboutButtonAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 238, 170, 50));
 
-        jLabel1.setFont(new java.awt.Font("SansSerif", 0, 48)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Developer Information & Credits");
-        aboutPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 60, 700, 90));
+        titleLabel.setFont(new java.awt.Font("SansSerif", 0, 48)); // NOI18N
+        titleLabel.setForeground(new java.awt.Color(255, 255, 255));
+        titleLabel.setText("Developer Information & Credits");
+        aboutPanel.add(titleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 60, 700, 90));
 
         backgroundAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/chatbotbg.png"))); // NOI18N
         backgroundAbout.setMaximumSize(new java.awt.Dimension(10, 10));
@@ -618,87 +617,98 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 try {
                     // Get input
                     input = inputField.getText();
-                    lowerCaseInput = input.toLowerCase();
+                    filteredInput = input.toLowerCase().replaceAll("[^A-Za-z0-9' ]", "");
 
                     // Display input
                     doc.insertString(doc.getLength(), "You: " + input + "\n", style);
 
-                    if (lowerCaseInput.contains("set question")) {
-                        String question = JOptionPane.showInputDialog(null, "Question");
-                        String answer = JOptionPane.showInputDialog(null, "Answer");
-                        qa.put(question, answer);
+                    // Allow user to add question and answer
+                    if (filteredInput.contains("set question")) {
+                        Object[] input = {"Question:", questionField, "Answer:", answerField};
+
+                        int option = JOptionPane.showConfirmDialog(null, input, "Set Question", JOptionPane.OK_CANCEL_OPTION);
+                        if (option == JOptionPane.OK_OPTION && !questionField.getText().isEmpty() && !answerField.getText().isEmpty()) {
+                            qa.put(questionField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", ""), answerField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", ""));
+                            questionField.setText("");
+                            answerField.setText("");
+                        } else {
+                            doc.insertString(doc.getLength(), "Chatbot: Cancelled" + "\n", null);
+                            questionField.setText("");
+                            answerField.setText("");
+                            resetInputField();
+                            return;
+                        }
+
                         try {
                             FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
                             ObjectOutputStream out = new ObjectOutputStream(fileOut);
                             out.writeObject(qa);
                             out.close();
                             fileOut.close();
-                            System.out.println("Serialized data is saved in questions.ser");
+                            doc.insertString(doc.getLength(), "Chatbot: Question successfully added" + "\n", null);
                         } catch (IOException i) {
-                            i.printStackTrace();
+                            doc.insertString(doc.getLength(), "Chatbot: IOException" + "\n", null);
                         }
-                        inputField.setText("");
-                        inputField.requestFocus();
+                        resetInputField();
                         return;
                     }
-                    for (Map.Entry m : qa.entrySet()) {
-                        String x = "" + m.getKey();
-                        if (input.contains(x)) {
-                            doc.insertString(doc.getLength(), "Chatbot: " + m.getValue() + "\n", null);
-                            inputField.setText("");
-                            inputField.requestFocus();
+                    for (Map.Entry question : qa.entrySet()) {
+                        String key = "" + question.getKey();
+                        if (input.contains(key)) {
+                            doc.insertString(doc.getLength(), "Chatbot: " + question.getValue() + "\n", null);
+                            resetInputField();
                             return;
                         }
                     }
 
                     // Reply
-                    if (lowerCaseInput.contains("set alarm")) {
+                    if (filteredInput.contains("set alarm")) {
                         alarmTime = input.substring(10);
                         doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + alarmTime + "\n", null);
-                    } else if (lowerCaseInput.contains("encode")) {
+                    } else if (filteredInput.contains("encode")) {
                         String value = input.substring(7);
                         doc.insertString(doc.getLength(), "Chatbot: " + Methods.Decimal2Bin(value) + "\n", null);
-                    } else if (lowerCaseInput.contains("decode")) {
+                    } else if (filteredInput.contains("decode")) {
                         String v1, v2;
                         v1 = input.substring(7, input.length() - 2);
                         v2 = input.substring(input.length() - 1);
                         doc.insertString(doc.getLength(), "Chatbot: " + v1 + " converted to base 10 is " + Methods.decode(v1, v2) + "\n", null);
-                    } else if (lowerCaseInput.contains("hello") || lowerCaseInput.contains("hi") || lowerCaseInput.contains("sup") || lowerCaseInput.contains("hey") || lowerCaseInput.contains("annyeong")) {
+                    } else if (filteredInput.contains("hello") || filteredInput.contains("hi") || filteredInput.contains("sup") || filteredInput.contains("hey") || filteredInput.contains("annyeong")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + greetings.get(randomGenerator.nextInt(greetings.size())) + "\n", null);
-                    } else if (lowerCaseInput.contains("what is your name")) {
+                    } else if (filteredInput.contains("what is your name")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: I don't have a name I'm just called Chatbot\n", null);
-                    } else if (lowerCaseInput.contains("bye")) {
+                    } else if (filteredInput.contains("bye")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + goodbye.get(randomGenerator.nextInt(goodbye.size())) + "\n", null);
-                    } else if (lowerCaseInput.contains("sorry")) {
+                    } else if (filteredInput.contains("sorry")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + sorry.get(randomGenerator.nextInt(sorry.size())) + "\n", null);
-                    } else if (lowerCaseInput.contains("i love you")) {
+                    } else if (filteredInput.contains("i love you")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(501) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: Aww love you too <3\n", null);
-                    } else if (lowerCaseInput.contains("how are you")) {
+                    } else if (filteredInput.contains("how are you")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: I'm doing well thankyou\n", null);
-                    } else if (lowerCaseInput.contains("thanks") || lowerCaseInput.contains("thx")) {
+                    } else if (filteredInput.contains("thanks") || filteredInput.contains("thx")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: No problem!\n", null);
-                    } else if (lowerCaseInput.contains("joke") || lowerCaseInput.contains("cheer me up")) {
+                    } else if (filteredInput.contains("joke") || filteredInput.contains("cheer me up")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(randomGenerator.nextInt(501) + 500);
                         typingStatus.setText("");
@@ -707,15 +717,19 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         chatbot();
                     }
 
-                    // clear input text field
-                    inputField.setText("");
-                    inputField.requestFocus();
+                    resetInputField();
                 } catch (BadLocationException | InterruptedException ex) {
                     Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }.start();
     } // inputFunction()
+    
+     // clear and reset input text field
+    private void resetInputField() {
+        inputField.setText("");
+        inputField.requestFocus();
+    }
 
     // commands
     private void chatbot() {
@@ -742,7 +756,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
         try {
             // Send replies
-            switch (lowerCaseInput) {
+            switch (filteredInput) {
                 // Commands
                 case "exit":
                     mc.Stop();
@@ -834,6 +848,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private javax.swing.JLabel aboutButtonChat;
     private javax.swing.JLabel aboutButtonHome;
     private javax.swing.JPanel aboutPanel;
+    private javax.swing.JTextField answerField;
     private javax.swing.JLabel backgroundAbout;
     private javax.swing.JLabel backgroundChat;
     private javax.swing.JLabel backgroundHome;
@@ -850,8 +865,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private javax.swing.JLabel homeButtonHome;
     private javax.swing.JPanel homePanel;
     private javax.swing.JTextField inputField;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel mainPanel;
     static javax.swing.JLabel musicStatus;
     private javax.swing.JLabel next;
@@ -861,11 +874,13 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private javax.swing.JLabel pause;
     private javax.swing.JLabel play;
     private javax.swing.JLabel previous;
+    private javax.swing.JTextField questionField;
     private javax.swing.JButton sendButton;
     private javax.swing.JLabel snoozeAbout;
     private javax.swing.JLabel snoozeChat;
     private javax.swing.JLabel snoozeHome;
     private javax.swing.JLabel stop;
+    private javax.swing.JLabel titleLabel;
     private javax.swing.JLabel typingStatus;
     // End of variables declaration//GEN-END:variables
 }
