@@ -680,16 +680,26 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         doc.insertString(doc.getLength(), "Chatbot: " + v1 + " converted to base 10 is " + Methods.decode(v1, v2) + "\n", null);
                     } else if (filteredInput.contains("remove question")) {
                         String x = filteredInput.substring(16);
-                        qa.remove(x);
-                        try {
-                            FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
-                            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                            out.writeObject(qa);
-                            out.close();
-                            fileOut.close();
-                            doc.insertString(doc.getLength(), "Chatbot: Question successfully removed" + "\n", null);
-                        } catch (IOException i) {
-                            doc.insertString(doc.getLength(), "Chatbot: IOException Error" + "\n", null);
+                        boolean valid = false;
+                        for (String key : qa.keySet()) {
+                            if (x.equals(key)) {
+                                qa.remove(x);
+                                valid = true;
+                                try {
+                                    FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
+                                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                                    out.writeObject(qa);
+                                    out.close();
+                                    fileOut.close();
+                                    doc.insertString(doc.getLength(), "Chatbot: Question successfully removed" + "\n", null);
+                                } catch (IOException i) {
+                                    doc.insertString(doc.getLength(), "Chatbot: IOException Error" + "\n", null);
+                                }
+                                break;
+                            }
+                        }
+                        if (!valid) {
+                            doc.insertString(doc.getLength(), "Chatbot: Error No such question" + "\n", null);
                         }
                     } else if (filteredInput.contains("hello") || filteredInput.contains("hi") || filteredInput.contains("sup") || filteredInput.contains("hey") || filteredInput.contains("annyeong")) {
                         typingStatus.setText("Chatbot is typing...");
