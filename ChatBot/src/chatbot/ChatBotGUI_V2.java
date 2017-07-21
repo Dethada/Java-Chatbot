@@ -120,7 +120,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         mcAlarm.Play(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
                         Display.setText("Alarm ringing");
                         notiBarChat.setText("Alarm ringing");
-                        notiBarAbout.setText("Alarm ringing");
                         musicStatus.setText("Alarm ringing");
                     }
 
@@ -159,7 +158,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         chatButtonHome = new javax.swing.JLabel();
         displayDate = new javax.swing.JLabel();
         clock = new javax.swing.JLabel();
-        aboutButtonHome = new javax.swing.JLabel();
         play = new javax.swing.JLabel();
         pause = new javax.swing.JLabel();
         stop = new javax.swing.JLabel();
@@ -178,17 +176,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         chatArea = new javax.swing.JTextPane();
         homeButtonChat = new javax.swing.JLabel();
         chatButtonChat = new javax.swing.JLabel();
-        aboutButtonChat = new javax.swing.JLabel();
         typingStatus = new javax.swing.JLabel();
         backgroundChat = new javax.swing.JLabel();
-        aboutPanel = new javax.swing.JPanel();
-        snoozeAbout = new javax.swing.JLabel();
-        notiBarAbout = new javax.swing.JLabel();
-        homeButtonAbout = new javax.swing.JLabel();
-        chatButtonAbout = new javax.swing.JLabel();
-        aboutButtonAbout = new javax.swing.JLabel();
-        titleLabel = new javax.swing.JLabel();
-        backgroundAbout = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Project Chatbot");
@@ -218,7 +207,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         homePanel.add(notiBarHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 14, 1030, 20));
 
         homeButtonHome.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        homePanel.add(homeButtonHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, 50));
+        homePanel.add(homeButtonHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 190, 80));
 
         chatButtonHome.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         chatButtonHome.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -226,7 +215,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 chatButtonHomeMouseReleased(evt);
             }
         });
-        homePanel.add(chatButtonHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 161, 170, 50));
+        homePanel.add(chatButtonHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 190, 80));
 
         displayDate.setFont(new java.awt.Font("DS-Digital", 0, 50)); // NOI18N
         displayDate.setForeground(new java.awt.Color(255, 255, 255));
@@ -239,14 +228,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         clock.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         clock.setText("6:23:25 PM");
         homePanel.add(clock, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 1070, 310));
-
-        aboutButtonHome.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        aboutButtonHome.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                aboutButtonHomeMouseReleased(evt);
-            }
-        });
-        homePanel.add(aboutButtonHome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 238, 160, 50));
 
         play.setToolTipText("Play");
         play.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -389,18 +370,10 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 homeButtonChatMouseReleased(evt);
             }
         });
-        chatPanel.add(homeButtonChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, 50));
+        chatPanel.add(homeButtonChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 190, 80));
 
         chatButtonChat.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        chatPanel.add(chatButtonChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 161, 170, 50));
-
-        aboutButtonChat.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        aboutButtonChat.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                aboutButtonChatMouseReleased(evt);
-            }
-        });
-        chatPanel.add(aboutButtonChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 238, 160, 50));
+        chatPanel.add(chatButtonChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 190, 80));
 
         typingStatus.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         typingStatus.setForeground(new java.awt.Color(70, 173, 212));
@@ -415,54 +388,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         chatPanel.add(backgroundChat, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -350, 1820, 1460));
 
         mainPanel.add(chatPanel, "card2");
-
-        aboutPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        snoozeAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        snoozeAbout.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                snoozeAboutMouseReleased(evt);
-            }
-        });
-        aboutPanel.add(snoozeAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(1285, 0, 65, 65));
-
-        notiBarAbout.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
-        notiBarAbout.setForeground(new java.awt.Color(0, 204, 204));
-        notiBarAbout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        notiBarAbout.setText("Remember to key in your ATS!");
-        aboutPanel.add(notiBarAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 14, 1030, 20));
-
-        homeButtonAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        homeButtonAbout.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                homeButtonAboutMouseReleased(evt);
-            }
-        });
-        aboutPanel.add(homeButtonAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 170, 50));
-
-        chatButtonAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        chatButtonAbout.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                chatButtonAboutMouseReleased(evt);
-            }
-        });
-        aboutPanel.add(chatButtonAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 161, 170, 50));
-
-        aboutButtonAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        aboutPanel.add(aboutButtonAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 238, 170, 50));
-
-        titleLabel.setFont(new java.awt.Font("SansSerif", 0, 48)); // NOI18N
-        titleLabel.setForeground(new java.awt.Color(255, 255, 255));
-        titleLabel.setText("Developer Information & Credits");
-        aboutPanel.add(titleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 60, 700, 90));
-
-        backgroundAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/chatbotbg.png"))); // NOI18N
-        backgroundAbout.setMaximumSize(new java.awt.Dimension(10, 10));
-        backgroundAbout.setMinimumSize(new java.awt.Dimension(10, 10));
-        backgroundAbout.setPreferredSize(new java.awt.Dimension(10, 10));
-        aboutPanel.add(backgroundAbout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -350, 1820, 1460));
-
-        mainPanel.add(aboutPanel, "card4");
 
         getContentPane().add(mainPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1360, 760));
 
@@ -487,22 +412,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private void chatButtonHomeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chatButtonHomeMouseReleased
         Methods.changePanel(mainPanel, chatPanel);
     }//GEN-LAST:event_chatButtonHomeMouseReleased
-
-    private void homeButtonAboutMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homeButtonAboutMouseReleased
-        Methods.changePanel(mainPanel, homePanel);
-    }//GEN-LAST:event_homeButtonAboutMouseReleased
-
-    private void chatButtonAboutMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chatButtonAboutMouseReleased
-        Methods.changePanel(mainPanel, chatPanel);
-    }//GEN-LAST:event_chatButtonAboutMouseReleased
-
-    private void aboutButtonHomeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_aboutButtonHomeMouseReleased
-        Methods.changePanel(mainPanel, aboutPanel);
-    }//GEN-LAST:event_aboutButtonHomeMouseReleased
-
-    private void aboutButtonChatMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_aboutButtonChatMouseReleased
-        Methods.changePanel(mainPanel, aboutPanel);
-    }//GEN-LAST:event_aboutButtonChatMouseReleased
 
     private void stopMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stopMouseReleased
         mc.Stop();
@@ -562,16 +471,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         mcAlarm.Stop();
         alarmTime = "";
     }//GEN-LAST:event_snoozeChatMouseReleased
-
-    private void snoozeAboutMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_snoozeAboutMouseReleased
-        if (!alarmTime.equals("")) {
-            JOptionPane.showMessageDialog(null, "Alarm dismissed");
-        } else {
-            JOptionPane.showMessageDialog(null, "No alarms to dismiss");
-        }
-        mcAlarm.Stop();
-        alarmTime = "";
-    }//GEN-LAST:event_snoozeAboutMouseReleased
 
     /**
      * @param args the command line arguments
@@ -878,23 +777,16 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     static javax.swing.JLabel Display;
     private javax.swing.JScrollPane ScrollPane;
-    private javax.swing.JLabel aboutButtonAbout;
-    private javax.swing.JLabel aboutButtonChat;
-    private javax.swing.JLabel aboutButtonHome;
-    private javax.swing.JPanel aboutPanel;
     private javax.swing.JTextField answerField;
-    private javax.swing.JLabel backgroundAbout;
     private javax.swing.JLabel backgroundChat;
     private javax.swing.JLabel backgroundHome;
     private javax.swing.JTextPane chatArea;
-    private javax.swing.JLabel chatButtonAbout;
     private javax.swing.JLabel chatButtonChat;
     private javax.swing.JLabel chatButtonHome;
     private javax.swing.JPanel chatPanel;
     private javax.swing.JLabel choose;
     private javax.swing.JLabel clock;
     private javax.swing.JLabel displayDate;
-    private javax.swing.JLabel homeButtonAbout;
     private javax.swing.JLabel homeButtonChat;
     private javax.swing.JLabel homeButtonHome;
     private javax.swing.JPanel homePanel;
@@ -902,7 +794,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private javax.swing.JPanel mainPanel;
     static javax.swing.JLabel musicStatus;
     private javax.swing.JLabel next;
-    static javax.swing.JLabel notiBarAbout;
     static javax.swing.JLabel notiBarChat;
     private javax.swing.JLabel notiBarHome;
     private javax.swing.JLabel pause;
@@ -910,11 +801,9 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private javax.swing.JLabel previous;
     private javax.swing.JTextField questionField;
     private javax.swing.JButton sendButton;
-    private javax.swing.JLabel snoozeAbout;
     private javax.swing.JLabel snoozeChat;
     private javax.swing.JLabel snoozeHome;
     private javax.swing.JLabel stop;
-    private javax.swing.JLabel titleLabel;
     private javax.swing.JLabel typingStatus;
     // End of variables declaration//GEN-END:variables
 }

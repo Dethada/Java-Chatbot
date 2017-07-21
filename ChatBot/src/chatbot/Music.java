@@ -21,7 +21,6 @@ import javax.swing.JOptionPane;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 import static chatbot.ChatBotGUI_V2.notiBarChat;
-import static chatbot.ChatBotGUI_V2.notiBarAbout;
 
 /**
  *
@@ -60,7 +59,6 @@ public class Music {
 
             Display.setText("Open your music folder to play songs");
             notiBarChat.setText("Remeber to key in your ATS!");
-            notiBarAbout.setText("Remeber to key in your ATS!");
             musicStatus.setText("Stopped");
         }
     }
@@ -274,7 +272,6 @@ public class Music {
     private void setDisplayPlaying() {
         Display.setText(currentSong);
         notiBarChat.setText(currentSong);
-        notiBarAbout.setText(currentSong);
         musicStatus.setText("Playing");
     }
 
