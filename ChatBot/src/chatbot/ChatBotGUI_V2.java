@@ -52,9 +52,9 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private final StyledDocument doc;
     private final Style style;
     // Replies
-    private HashMap<String, String> qa;
+    private HashMap<String, String> questionAnswer;
     private final ArrayList<String> greetings;
-    private final ArrayList<String> jokes;
+    private final ArrayList<String> jokes; 
     private final ArrayList<String> goodbye;
     private final ArrayList<String> defaultReply;
     private final ArrayList<String> sorry;
@@ -132,7 +132,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         try {
             FileInputStream fileIn = new FileInputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
             ObjectInputStream in = new ObjectInputStream(fileIn);
-            qa = (HashMap<String, String>) in.readObject();
+            questionAnswer = (HashMap<String, String>) in.readObject();
             in.close();
             fileIn.close();
         } catch (IOException | ClassNotFoundException i) {
@@ -632,13 +632,13 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                             String questionText = questionField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
                             String answerText = answerField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
                             if (!questionText.isEmpty() && !answerText.isEmpty()) {
-                                qa.put(questionText, answerText);
+                                questionAnswer.put(questionText, answerText);
                                 questionField.setText("");
                                 answerField.setText("");
                                 try {
                                     FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
                                     ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                                    out.writeObject(qa);
+                                    out.writeObject(questionAnswer);
                                     out.close();
                                     fileOut.close();
                                     doc.insertString(doc.getLength(), "Chatbot: Question successfully added" + "\n", null);
@@ -658,9 +658,9 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         resetInputField();
                         return;
                     }
-                    for (Map.Entry question : qa.entrySet()) {
+                    for (Map.Entry question : questionAnswer.entrySet()) {
                         String key = "" + question.getKey();
-                        if (input.equals(key)) {
+                        if (filteredInput.equals(key)) {
                             doc.insertString(doc.getLength(), "Chatbot: " + question.getValue() + "\n", null);
                             resetInputField();
                             return;
@@ -681,14 +681,14 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     } else if (filteredInput.contains("remove question")) {
                         String x = filteredInput.substring(16);
                         boolean valid = false;
-                        for (String key : qa.keySet()) {
+                        for (String key : questionAnswer.keySet()) {
                             if (x.equals(key)) {
-                                qa.remove(x);
+                                questionAnswer.remove(x);
                                 valid = true;
                                 try {
                                     FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
                                     ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                                    out.writeObject(qa);
+                                    out.writeObject(questionAnswer);
                                     out.close();
                                     fileOut.close();
                                     doc.insertString(doc.getLength(), "Chatbot: Question successfully removed" + "\n", null);
@@ -801,7 +801,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     break;
                 case "list questions":
                     doc.insertString(doc.getLength(), "List of User added Questions\n----------------------------------------------------\n", null);
-                    for (String s : qa.keySet()) {
+                    for (String s : questionAnswer.keySet()) {
                         doc.insertString(doc.getLength(), s + "\n", null);
                     }
                     break;
