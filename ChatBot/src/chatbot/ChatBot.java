@@ -93,8 +93,8 @@ public class ChatBot extends javax.swing.JFrame {
         // Initiate convo
         try {
             doc.insertString(doc.getLength(), "Type " + "\"" + "help" + "\"" + " to show the list of commands available.\n", white);
-            doc.insertString(doc.getLength(), "Chatbot: Hi nice to meet you here is a quote for you!\n" 
-                    + Methods.getQuote() + "\n" , null);
+            doc.insertString(doc.getLength(), "Chatbot: Hi nice to meet you here is a quote for you!\n"
+                    + Methods.getQuote() + "\n", null);
         } catch (BadLocationException e) {
             System.out.println(e);
         }
@@ -158,6 +158,7 @@ public class ChatBot extends javax.swing.JFrame {
         answerField = new javax.swing.JTextField();
         mainPanel = new javax.swing.JPanel();
         homePanel = new javax.swing.JPanel();
+        noOfSongs = new javax.swing.JLabel();
         snoozeHome = new javax.swing.JLabel();
         notiBarHome = new javax.swing.JLabel();
         homeButtonHome = new javax.swing.JLabel();
@@ -197,6 +198,10 @@ public class ChatBot extends javax.swing.JFrame {
         mainPanel.setLayout(new java.awt.CardLayout());
 
         homePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        noOfSongs.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        noOfSongs.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        homePanel.add(noOfSongs, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 610, 130, 30));
 
         snoozeHome.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         snoozeHome.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -511,7 +516,7 @@ public class ChatBot extends javax.swing.JFrame {
                     if (input.equals("")) {
                         return;
                     }
-                    filteredInput = input.toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
+                    filteredInput = Methods.filter(input);
 
                     // Display input
                     doc.insertString(doc.getLength(), "You: " + input + "\n", orange);
@@ -522,8 +527,8 @@ public class ChatBot extends javax.swing.JFrame {
 
                         int option = JOptionPane.showConfirmDialog(rootPane, input, "Set Question", JOptionPane.OK_CANCEL_OPTION);
                         if (option == JOptionPane.OK_OPTION) {
-                            String questionText = questionField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
-                            String answerText = answerField.getText().toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
+                            String questionText = Methods.filter(questionField.getText());
+                            String answerText = Methods.filter(answerField.getText());
                             if (!questionText.isEmpty() && !answerText.isEmpty()) {
                                 questionAnswer.put(questionText, answerText);
                                 questionField.setText("");
@@ -551,7 +556,7 @@ public class ChatBot extends javax.swing.JFrame {
                         resetInputField();
                         return;
                     }
-                    // Checks if input is a set question
+                    // Checks if input is a set question, reply with set answer if it is
                     for (Map.Entry question : questionAnswer.entrySet()) {
                         String key = "" + question.getKey();
                         if (filteredInput.equals(key)) {
@@ -595,32 +600,72 @@ public class ChatBot extends javax.swing.JFrame {
                         if (!valid) {
                             doc.insertString(doc.getLength(), "Chatbot: Error No such question" + "\n", null);
                         }
-                    // Normal replies
-                    } else if (filteredInput.contains("hello") || filteredInput.contains("hi") || filteredInput.contains("sup") || filteredInput.contains("hey") || filteredInput.contains("annyeong")) {
+                        // Normal replies
+                    } else if (Methods.checkContains(filteredInput, "hello", "hi", "sup", "hey", "annyeong", "konichiwa")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + greetings.get(rngReply.getNum(greetings.size())) + "\n", null);
-                    } else if (filteredInput.contains("quote")) {
+                    } else if (Methods.checkContains(filteredInput, "quote")) {
                         typingStatus.setText("Chatbot is typing...");
                         doc.insertString(doc.getLength(), "Chatbot: " + Methods.getQuote() + "\n", null);
                         typingStatus.setText("");
-                    } else if (filteredInput.contains("bye")) {
+                    } else if (Methods.checkContains(filteredInput, "bye", "see you", "zai jian")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + goodbye.get(rngReply.getNum(goodbye.size())) + "\n", null);
-                    } else if (filteredInput.contains("sorry") || filteredInput.contains("srry")) {
+                    } else if (Methods.checkContains(filteredInput, "do you like")) {
+                        typingStatus.setText("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        typingStatus.setText("");
+                        doc.insertString(doc.getLength(), "Chatbot: I don\'t really have a preference.\n", null);
+                    } else if (Methods.checkContains(filteredInput, "who are you", "who you")) {
+                        typingStatus.setText("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        typingStatus.setText("");
+                        doc.insertString(doc.getLength(), "Chatbot: I'm a chitty chatty little bot.\n", null);
+                    } else if (Methods.checkContains(filteredInput, "what is your name", "how do i address you")) {
+                        typingStatus.setText("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        typingStatus.setText("");
+                        doc.insertString(doc.getLength(), "Chatbot: I am just called chatbot cause my creator have no creativity :(\n", null);
+                    } else if (Methods.checkContains(filteredInput, "what do you do", "what can you do")) {
+                        typingStatus.setText("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        typingStatus.setText("");
+                        doc.insertString(doc.getLength(), "Chatbot: I can do quite a few things for example playing music. You can see more by typing \"help\"\n", null);
+                    } else if (Methods.checkContains(filteredInput, "are you real")) {
+                        typingStatus.setText("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        typingStatus.setText("");
+                        doc.insertString(doc.getLength(), "Chatbot: I am more real than most people.\n", null);
+                    } else if (Methods.checkContains(filteredInput, "how are you", "how is it going")) {
+                        typingStatus.setText("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        typingStatus.setText("");
+                        doc.insertString(doc.getLength(), "Chatbot: I'm doing quite okay\n", null);
+                    } else if (Methods.checkContains(filteredInput, "love you", "muacks", "xoxo")) {
+                        typingStatus.setText("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        typingStatus.setText("");
+                        doc.insertString(doc.getLength(), "Chatbot: Aww That's nice.\n", null);
+                    } else if (Methods.checkContains(filteredInput, "how are you created", "what are you written in")) {
+                        typingStatus.setText("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        typingStatus.setText("");
+                        doc.insertString(doc.getLength(), "Chatbot: I am created in the Programming language called Java.\n", null);
+                    } else if (Methods.checkContains(filteredInput, "sorry", "apologise")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + sorry.get(rngReply.getNum(sorry.size())) + "\n", null);
-                    } else if (filteredInput.contains("thanks") || filteredInput.contains("thx")) {
+                    } else if (Methods.checkContains(filteredInput, "thanks", "xie xie")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: No problem!\n", null);
-                    } else if (filteredInput.contains("joke") || filteredInput.contains("cheer me up") || filteredInput.contains("need motivation")) {
+                    } else if (Methods.checkContains(filteredInput, "joke", "cheer me up", "need motivation", "bored")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(501) + 500);
                         typingStatus.setText("");
@@ -755,11 +800,6 @@ public class ChatBot extends javax.swing.JFrame {
                     mc.changeDir();
                     doc.insertString(doc.getLength(), "Chatbot: Music directory changed\n", null);
                     break;
-                case "new quote":
-                    typingStatus.setText("Chatbot is typing...");
-                    doc.insertString(doc.getLength(), "Chatbot: " + Methods.getQuote() + "\n", null);
-                    typingStatus.setText("");
-                    break;
                 default:
                     doc.insertString(doc.getLength(), "Chatbot: " + defaultReply.get(rngReply.getNum(defaultReply.size())) + "\n", null);
                     break;
@@ -790,6 +830,7 @@ public class ChatBot extends javax.swing.JFrame {
     private javax.swing.JPanel mainPanel;
     static javax.swing.JLabel musicStatus;
     private javax.swing.JLabel next;
+    static javax.swing.JLabel noOfSongs;
     static javax.swing.JLabel notiBarChat;
     private javax.swing.JLabel notiBarHome;
     private javax.swing.JLabel pause;

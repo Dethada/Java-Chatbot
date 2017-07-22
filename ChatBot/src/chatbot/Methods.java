@@ -88,7 +88,7 @@ public class Methods {
         String items = array[0] + "";
         JsonElement jelement = new JsonParser().parse(items);
         JsonArray jarray = jelement.getAsJsonArray();
-        
+
         output = "";
 
         for (int i = 0; i < jarray.size(); i++) {
@@ -144,7 +144,6 @@ public class Methods {
 
             BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
 
-            
             while ((output = br.readLine()) != null) {
                 json = output;
             }
@@ -156,7 +155,7 @@ public class Methods {
         } catch (IOException e) {
             return "Chatbot: Error IOException occured\n";
         }
-        
+
         json = json.substring(2, json.length() - 1);
         Quote quote = gson.fromJson(json, Quote.class);
         if (quote.getQuoteAuthor().equals("")) {
@@ -197,5 +196,35 @@ public class Methods {
         mainPanel.add(panel);
         mainPanel.repaint();
         mainPanel.revalidate();
-    } // changePanel()
+    }
+
+    // Checks if the main string provided contains the strings to be checked
+    public static boolean checkContains(String main, String... checks) {
+        for (String s:checks) {
+            if (main.contains(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Filters out non-alphanumeric characters and replaces shortforms
+    public static String filter(String text) {
+        String filtered;
+
+        filtered = " " + text.toLowerCase().replaceAll("[^A-Za-z0-9' ]", "") + " ";
+        filtered = filtered.replaceAll("(\\ u +)", " you ");
+        filtered = filtered.replaceAll("(\\ r +)", " are ");
+        filtered = filtered.replaceAll("(\\ thx +)", " thanks ");
+        filtered = filtered.replaceAll("(\\ ur +)", " your ");
+        filtered = filtered.replaceAll("(\\ k +)", " okay ");
+        filtered = filtered.replaceAll("(\\ y +)", " why ");
+        filtered = filtered.replaceAll("(\\ wat +)", " what ");
+        filtered = filtered.replaceAll("(\\ srry +)", " sorry ");
+        filtered = filtered.replaceAll("(\\ luv +)", " love ");
+        filtered = filtered.trim();
+
+        return filtered;
+    }
+
 } // End Methods class

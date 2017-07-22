@@ -5,6 +5,7 @@ package chatbot;
 
 import static chatbot.ChatBot.Display;
 import static chatbot.ChatBot.musicStatus;
+import static chatbot.ChatBot.noOfSongs;
 import static chatbot.ChatBot.notiBarChat;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -28,7 +29,6 @@ import javazoom.jl.player.Player;
  */
 public class Music {
 
-    
     boolean stopped;
     int songNo;
     File folder;
@@ -42,7 +42,7 @@ public class Music {
     private BufferedInputStream BIS;
     private final ArrayList<String> songs;
     private final ArrayList<String> playList;
-    private final Random rng  = new Random();
+    private final Random rng = new Random();
     private Player player;
 
     public Music() {
@@ -60,6 +60,7 @@ public class Music {
             Display.setText("Open your music folder to play songs");
             notiBarChat.setText("Remeber to key in your ATS!");
             musicStatus.setText("Stopped");
+            noOfSongs.setText("");
         }
     }
 
@@ -100,7 +101,7 @@ public class Music {
 
                     if (player.isComplete()) {
                         songNo++;
-                        currentSong = songs.get(songNo);
+                        currentSong = playList.get(songNo);
                         Play(folder + "\\" + currentSong);
                     }
                 } catch (JavaLayerException ex) {
@@ -113,7 +114,9 @@ public class Music {
         if (!songs.isEmpty()) {
             // reshuffle playlist if music was stopped
             if (stopped) {
-                restart();
+                createPlaylist();
+                currentSong = playList.get(songNo);
+                Play(folder + "\\" + currentSong);
                 stopped = false;
             } else if (!playing) {
                 setDisplayPlaying();
@@ -160,49 +163,38 @@ public class Music {
     }
 
     // lets first user choose music dir else jus play from the saved dir
-    public void chooseDir() throws IndexOutOfBoundsException, NullPointerException{
+    public void chooseDir() throws IndexOutOfBoundsException, NullPointerException {
+        // if directory is not yet set
         if (!getProp("fileChoosen").equals("yes")) {
+            // Open directory chooser
             JFileChooser chooser = new JFileChooser("D:\\Media");
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             chooser.setAcceptAllFileFilterUsed(false);
-            songs.clear();
 
             int option = chooser.showOpenDialog(null);
-
             if (option == JFileChooser.APPROVE_OPTION) {
-                File songpaths = chooser.getSelectedFile();
-                String dirPath = songpaths + "";
-                folder = new File(dirPath);
+                folder = new File("" + chooser.getSelectedFile());
                 File[] listOfFiles = folder.listFiles();
-                saveProp("musicDir", "" + folder);
 
-                for (File listOfFile : listOfFiles) {
-                    if (listOfFile.isFile() && listOfFile.getName().endsWith(".mp3")) {
-                        songs.add(listOfFile.getName());
-                    }
-                }
-
-                getSong();
+                getSongs(listOfFiles);
+                createPlaylist();
 
                 currentSong = playList.get(songNo);
                 Stop();
                 Play(folder + "\\" + currentSong);
+                saveProp("musicDir", "" + folder);
                 saveProp("fileChoosen", "yes");
             } else {
                 JOptionPane.showMessageDialog(null, "No selection", "Error", 0);
             }
+            // if directory is already set
         } else {
             songs.clear();
             folder = new File(getProp("musicDir"));
             File[] listOfFiles = folder.listFiles();
 
-            for (File listOfFile : listOfFiles) {
-                if (listOfFile.isFile() && listOfFile.getName().endsWith(".mp3")) {
-                    songs.add(listOfFile.getName());
-                }
-            }
-
-            getSong();
+            getSongs(listOfFiles);
+            createPlaylist();
 
             currentSong = playList.get(songNo);
             Stop();
@@ -210,17 +202,17 @@ public class Music {
         }
     }
 
-    // reshuffles playlist
-    public void restart() {
-        getSong();
-
-        currentSong = playList.get(songNo);
-        Play(folder + "\\" + currentSong);
+    public void getSongs(File[] listOfFiles) {
+        for (File file : listOfFiles) {
+            if (file.isFile() && file.getName().endsWith(".mp3")) {
+                songs.add(file.getName());
+            }
+        }
     }
 
     // gets the songs in the dir and shuffles them into a playlist
-    public void getSong() {
-
+    public void createPlaylist() {
+        songNo = 0;
         playList.clear();
         for (int i = 0; i < songs.size(); i++) {
             String name = songs.get(rng.nextInt(songs.size()));
@@ -268,11 +260,12 @@ public class Music {
 
         return value;
     }
-    
+
     private void setDisplayPlaying() {
         Display.setText(currentSong.substring(0, currentSong.length() - 4));
         notiBarChat.setText(currentSong.substring(0, currentSong.length() - 4));
         musicStatus.setText("Playing");
+        noOfSongs.setText(songNo + 1 + "/" + playList.size());
     }
 
 } // End Music class
