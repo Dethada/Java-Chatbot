@@ -217,11 +217,15 @@ public class Methods {
         filtered = filtered.replaceAll("(\\ r +)", " are ");
         filtered = filtered.replaceAll("(\\ thx +)", " thanks ");
         filtered = filtered.replaceAll("(\\ ur +)", " your ");
-        filtered = filtered.replaceAll("(\\ k +)", " okay ");
+        filtered = filtered.replaceAll("(\\ k +)", " ok ");
+        filtered = filtered.replaceAll("(\\ okay +)", " ok ");
         filtered = filtered.replaceAll("(\\ y +)", " why ");
         filtered = filtered.replaceAll("(\\ wat +)", " what ");
         filtered = filtered.replaceAll("(\\ srry +)", " sorry ");
         filtered = filtered.replaceAll("(\\ luv +)", " love ");
+        filtered = filtered.replaceAll("(\\ yea +)", " yes ");
+        filtered = filtered.replaceAll("(\\ ye +)", " yes ");
+        filtered = filtered.replaceAll("(\\ yeah +)", " yes ");
         filtered = filtered.trim();
 
         return filtered;

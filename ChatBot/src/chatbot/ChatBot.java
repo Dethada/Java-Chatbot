@@ -528,7 +528,7 @@ public class ChatBot extends javax.swing.JFrame {
                         int option = JOptionPane.showConfirmDialog(rootPane, input, "Set Question", JOptionPane.OK_CANCEL_OPTION);
                         if (option == JOptionPane.OK_OPTION) {
                             String questionText = Methods.filter(questionField.getText());
-                            String answerText = Methods.filter(answerField.getText());
+                            String answerText = answerField.getText();
                             if (!questionText.isEmpty() && !answerText.isEmpty()) {
                                 questionAnswer.put(questionText, answerText);
                                 questionField.setText("");
@@ -635,6 +635,11 @@ public class ChatBot extends javax.swing.JFrame {
                         Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: I can do quite a few things for example playing music. You can see more by typing \"help\"\n", null);
+                    } else if (Methods.checkContains(filteredInput, "ok", "yes", "no", "right")) {
+                        typingStatus.setText("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        typingStatus.setText("");
+                        doc.insertString(doc.getLength(), "Chatbot: Okay\n", null);
                     } else if (Methods.checkContains(filteredInput, "are you real")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
