@@ -3,20 +3,17 @@
  */
 package chatbot;
 
-import java.util.Random;
-
 /**
  *
  * @author David
  */
-public class RNG {
+public class RNG extends java.util.Random {
 
     private int prev = 0, current = 0;
-    private final Random rng = new Random();
 
-    public int getNum(int x) {
+    public int getNum(int bound) {
         while (prev == current) {
-            current = rng.nextInt(x);
+            current = nextInt(bound);
         }
         prev = current;
         return current;

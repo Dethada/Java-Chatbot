@@ -33,6 +33,6 @@ public class UV {
 
     @Override
     public String toString() {
-        return "ClassPojo [api_info = " + api_info + ", items = " + items + "]";
+        return "[api_info = " + api_info + ", items = " + items + "]";
     }
 }

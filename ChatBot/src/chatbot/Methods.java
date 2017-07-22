@@ -3,7 +3,6 @@
  */
 package chatbot;
 
-import java.util.Random;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Random;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -32,7 +32,7 @@ public class Methods {
         // Converts and prints the answer
         return intValue + " in binary: " + Integer.toBinaryString(intValue) + ", " + intValue
                 + " in hexadecimal: " + (Integer.toHexString(intValue)).toUpperCase();
-    } // end Decimal2Bin
+    }
 
     // Takes binary/hex value and converts to decimal
     public static int decode(String value, String base) {
@@ -40,20 +40,22 @@ public class Methods {
 
         //Integer.valueOf("AB", 16);
         return Integer.valueOf(value, intBase);
-    } // end decode
+    }
 
     // Flips a coin
     public static String coinFlip() {
-        // new Random object
         Random randomGenerator = new Random();
 
         String[] flip = {"heads", "tails"};
         return (flip[randomGenerator.nextInt(2)]);
-    } // end coinFlip()
+    }
 
     // Gets current uv levels
     public static String getData() {
-        String json = "";
+        String json = "", output;
+        Index index;
+        String level;
+        Gson gson = new Gson();
 
         try {
 
@@ -69,9 +71,7 @@ public class Methods {
 
             BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
 
-            String output;
             while ((output = br.readLine()) != null) {
-                //System.out.println(output);
                 json = output;
             }
 
@@ -80,20 +80,16 @@ public class Methods {
         } catch (ClientProtocolException e) {
             return "Chatbot: check your internet connection\n";
         } catch (IOException e) {
-            return "Chatbot: check your internet connection\n";
+            return "Chatbot: Error IOException occured\n";
         }
-
-        Gson gson = new Gson();
 
         UV uvAPI = gson.fromJson(json, UV.class);
         Items[] array = uvAPI.getItems();
         String items = array[0] + "";
         JsonElement jelement = new JsonParser().parse(items);
         JsonArray jarray = jelement.getAsJsonArray();
-
-        Index index;
-        String level;
-        String output = "";
+        
+        output = "";
 
         for (int i = 0; i < jarray.size(); i++) {
             index = gson.fromJson(jarray.get(i), Index.class);
@@ -126,14 +122,55 @@ public class Methods {
             }
 
             output += "UV index at " + intTime + " " + morn_night + " is " + index.getValue() + " (" + level + ")\n";
-        } // End for loop
+        } // for
 
         return output;
-    } // End getData()
+    }
+
+    public static String getQuote() {
+        String json = "", output, author;
+        Gson gson = new Gson();
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpGet getRequest = new HttpGet("https://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=jsonp&jsonp=?");
+
+            HttpResponse response = httpClient.execute(getRequest);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                return "Chatbot: received HTTP error code : " + response.getStatusLine().getStatusCode();
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
+
+            
+            while ((output = br.readLine()) != null) {
+                json = output;
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+        } catch (ClientProtocolException e) {
+            return "Chatbot: check your internet connection\n";
+        } catch (IOException e) {
+            return "Chatbot: Error IOException occured\n";
+        }
+        
+        json = json.substring(2, json.length() - 1);
+        Quote quote = gson.fromJson(json, Quote.class);
+        if (quote.getQuoteAuthor().equals("")) {
+            author = "Unknown";
+        } else {
+            author = quote.getQuoteAuthor();
+        }
+        return "\"" + quote.getQuoteText() + "\"" + " - " + author;
+    }
 
     // Reads replies from file and stores into ArrayList
     public static ArrayList<String> readFile(String path) {
         ArrayList<String> array = new ArrayList<>();
+
         try {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
@@ -160,5 +197,5 @@ public class Methods {
         mainPanel.add(panel);
         mainPanel.repaint();
         mainPanel.revalidate();
-    }
+    } // changePanel()
 } // End Methods class

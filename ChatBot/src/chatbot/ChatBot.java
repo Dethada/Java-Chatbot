@@ -1,5 +1,5 @@
 /*
- * Chat bot version 2.0
+ * Main class for the chatbot
  */
 package chatbot;
 
@@ -18,7 +18,6 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -31,7 +30,7 @@ import javax.swing.text.StyledDocument;
  *
  * @author David
  */
-public class ChatBotGUI_V2 extends javax.swing.JFrame {
+public class ChatBot extends javax.swing.JFrame {
 
     /**
      * Creates new form ChatBotGUI_V2
@@ -50,7 +49,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private String filteredInput;
     // For font color
     private final StyledDocument doc;
-    private final Style style;
+    private final Style orange;
+    private final Style white;
     // Replies
     private HashMap<String, String> questionAnswer;
     private final ArrayList<String> greetings;
@@ -62,7 +62,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private final RNG rngReply;
     private final RNG rngTime;
 
-    public ChatBotGUI_V2() {
+    public ChatBot() {
         this.alarmTime = "";
         this.rngReply = new RNG();
         this.rngTime = new RNG();
@@ -74,8 +74,10 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
         // Set font color
         doc = chatArea.getStyledDocument();
-        style = chatArea.addStyle("This is a style", null);
-        StyleConstants.setForeground(style, Color.ORANGE);
+        orange = chatArea.addStyle("style", null);
+        white = chatArea.addStyle("style2", null);
+        StyleConstants.setForeground(orange, Color.ORANGE);
+        StyleConstants.setForeground(white, Color.WHITE);
 
         // Read stored replies from file
         greetings = Methods.readFile(System.getProperty("user.dir") + "\\replies\\greetings.txt");
@@ -90,13 +92,15 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
         // Initiate convo
         try {
-            doc.insertString(doc.getLength(), "Chatbot: Hi\ud83d\ude00 nice to meet you I am the third generation chatbot. Type help to show the list of commands available.\n", null);
+            doc.insertString(doc.getLength(), "Type " + "\"" + "help" + "\"" + " to show the list of commands available.\n", white);
+            doc.insertString(doc.getLength(), "Chatbot: Hi nice to meet you here is a quote for you!\n" 
+                    + Methods.getQuote() + "\n" , null);
         } catch (BadLocationException e) {
             System.out.println(e);
         }
 
         // Clock
-        new Thread() {
+        new Thread("Clock") {
             @Override
             public void run() {
                 while (true) {
@@ -116,7 +120,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         try {
                             doc.insertString(doc.getLength(), "Chatbot: Alarm rang at " + currentTime + "\n", null);
                         } catch (BadLocationException ex) {
-                            Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         mc.Pause();
                         mcAlarm.Play(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
@@ -139,7 +143,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         } catch (IOException | ClassNotFoundException i) {
             JOptionPane.showMessageDialog(rootPane, "questions.ser might be missing", "Error", 0);
         }
-    } // ChatBotGUI_V2()
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -424,7 +428,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         try {
             mc.Resume();
         } catch (IOException ex) {
-            Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_playMouseReleased
 
@@ -474,9 +478,6 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
         alarmTime = "";
     }//GEN-LAST:event_snoozeChatMouseReleased
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
         /* Set the Windows look and feel */
         try {
@@ -487,12 +488,12 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ChatBotGUI_V2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ChatBot.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            ChatBotGUI_V2 frame = new ChatBotGUI_V2();
+            ChatBot frame = new ChatBot();
             frame.setVisible(true);
             // set icon
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(System.getProperty("user.dir") + "\\images\\icon.png"));
@@ -501,7 +502,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
     // handles user input
     private void inputFunction() {
-        new Thread() {
+        new Thread("Reply") {
             @Override
             public void run() {
                 try {
@@ -513,7 +514,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     filteredInput = input.toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
 
                     // Display input
-                    doc.insertString(doc.getLength(), "You: " + input + "\n", style);
+                    doc.insertString(doc.getLength(), "You: " + input + "\n", orange);
 
                     // Allow user to add question and answer
                     if (filteredInput.equals("set question")) {
@@ -600,37 +601,26 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + greetings.get(rngReply.getNum(greetings.size())) + "\n", null);
-                    } else if (filteredInput.contains("what is your name")) {
+                    } else if (filteredInput.contains("quote")) {
                         typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(rngTime.getNum(251) + 500);
+                        doc.insertString(doc.getLength(), "Chatbot: " + Methods.getQuote() + "\n", null);
                         typingStatus.setText("");
-                        doc.insertString(doc.getLength(), "Chatbot: I don't have a name I'm just called Chatbot\n", null);
                     } else if (filteredInput.contains("bye")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + goodbye.get(rngReply.getNum(goodbye.size())) + "\n", null);
-                    } else if (filteredInput.contains("sorry")) {
+                    } else if (filteredInput.contains("sorry") || filteredInput.contains("srry")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + sorry.get(rngReply.getNum(sorry.size())) + "\n", null);
-                    } else if (filteredInput.contains("i love you")) {
-                        typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(rngTime.getNum(501) + 500);
-                        typingStatus.setText("");
-                        doc.insertString(doc.getLength(), "Chatbot: Aww love you too <3\n", null);
-                    } else if (filteredInput.contains("how are you")) {
-                        typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(rngTime.getNum(251) + 500);
-                        typingStatus.setText("");
-                        doc.insertString(doc.getLength(), "Chatbot: I'm doing well thankyou\n", null);
                     } else if (filteredInput.contains("thanks") || filteredInput.contains("thx")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: No problem!\n", null);
-                    } else if (filteredInput.contains("joke") || filteredInput.contains("cheer me up")) {
+                    } else if (filteredInput.contains("joke") || filteredInput.contains("cheer me up") || filteredInput.contains("need motivation")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(501) + 500);
                         typingStatus.setText("");
@@ -641,11 +631,11 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
 
                     resetInputField();
                 } catch (BadLocationException | InterruptedException ex) {
-                    Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }.start();
-    } // inputFunction()
+    }
 
     // clear and reset input text field
     private void resetInputField() {
@@ -664,6 +654,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 + "decode <bin/hex> <base>\t\t- Converts a binary/hex to decimal\n"
                 + "set question\t\t\t\t- Set/update a question\n"
                 + "list questions\t\t\t\t- Lists all the set questions\n"
+                + "uv\t\t\t\t\t\t- Shows the UV readings of the day\n"
+                + "new quote\t\t\t\t\t- Shows a random quote\n"
                 + "coinflip\t\t\t\t\t- Flips a coin\n"
                 + "joke\t\t\t\t\t\t- Tells a joke\n"
                 + "mc dir\t\t\t\t\t- Choose your music directory\n"
@@ -763,15 +755,20 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     mc.changeDir();
                     doc.insertString(doc.getLength(), "Chatbot: Music directory changed\n", null);
                     break;
+                case "new quote":
+                    typingStatus.setText("Chatbot is typing...");
+                    doc.insertString(doc.getLength(), "Chatbot: " + Methods.getQuote() + "\n", null);
+                    typingStatus.setText("");
+                    break;
                 default:
                     doc.insertString(doc.getLength(), "Chatbot: " + defaultReply.get(rngReply.getNum(defaultReply.size())) + "\n", null);
                     break;
             } // switch
         } catch (BadLocationException | IOException ex) {
-            Logger.getLogger(ChatBotGUI_V2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    } // chatbot()
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     static javax.swing.JLabel Display;

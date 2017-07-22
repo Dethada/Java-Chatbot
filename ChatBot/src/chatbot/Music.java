@@ -3,8 +3,9 @@
  */
 package chatbot;
 
-import static chatbot.ChatBotGUI_V2.Display;
-import static chatbot.ChatBotGUI_V2.musicStatus;
+import static chatbot.ChatBot.Display;
+import static chatbot.ChatBot.musicStatus;
+import static chatbot.ChatBot.notiBarChat;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +21,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
-import static chatbot.ChatBotGUI_V2.notiBarChat;
 
 /**
  *
@@ -28,10 +28,10 @@ import static chatbot.ChatBotGUI_V2.notiBarChat;
  */
 public class Music {
 
+    
     boolean stopped;
     int songNo;
     File folder;
-    
     private long pauseLocation;
     private long songTotalLength;
     private boolean playing;
@@ -42,7 +42,7 @@ public class Music {
     private BufferedInputStream BIS;
     private final ArrayList<String> songs;
     private final ArrayList<String> playList;
-    private final Random randomGenerator  = new Random();
+    private final Random rng  = new Random();
     private Player player;
 
     public Music() {
@@ -107,7 +107,7 @@ public class Music {
                 }
             }
         }.start();
-    } // Play()
+    }
 
     public void Resume() throws IOException {
         if (!songs.isEmpty()) {
@@ -139,7 +139,7 @@ public class Music {
                 }.start();
             } // else if
         } // if
-    } // Resume()
+    }
 
     public void next() {
         playing = true;
@@ -167,9 +167,9 @@ public class Music {
             chooser.setAcceptAllFileFilterUsed(false);
             songs.clear();
 
-            int returnVal = chooser.showOpenDialog(null);
+            int option = chooser.showOpenDialog(null);
 
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
+            if (option == JFileChooser.APPROVE_OPTION) {
                 File songpaths = chooser.getSelectedFile();
                 String dirPath = songpaths + "";
                 folder = new File(dirPath);
@@ -223,7 +223,7 @@ public class Music {
 
         playList.clear();
         for (int i = 0; i < songs.size(); i++) {
-            String name = songs.get(randomGenerator.nextInt(songs.size()));
+            String name = songs.get(rng.nextInt(songs.size()));
 
             if (!playList.contains(name)) {
                 playList.add(name);
@@ -270,8 +270,8 @@ public class Music {
     }
     
     private void setDisplayPlaying() {
-        Display.setText(currentSong);
-        notiBarChat.setText(currentSong);
+        Display.setText(currentSong.substring(0, currentSong.length() - 4));
+        notiBarChat.setText(currentSong.substring(0, currentSong.length() - 4));
         musicStatus.setText("Playing");
     }
 

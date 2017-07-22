@@ -45,7 +45,6 @@ public class Items {
 
     @Override
     public String toString() {
-        //return "Items [timestamp = " + timestamp + ", update_timestamp = " + update_timestamp + ", index = " + index + "]";
         return Arrays.toString(index);
     }
 }
