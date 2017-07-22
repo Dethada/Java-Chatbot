@@ -11,8 +11,8 @@ import java.util.Random;
  */
 public class RNG {
 
-    int prev = 0, current = 0;
-    Random rng = new Random();
+    private int prev = 0, current = 0;
+    private final Random rng = new Random();
 
     public int getNum(int x) {
         while (prev == current) {

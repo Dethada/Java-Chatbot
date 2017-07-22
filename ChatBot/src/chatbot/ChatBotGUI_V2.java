@@ -54,7 +54,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     // Replies
     private HashMap<String, String> questionAnswer;
     private final ArrayList<String> greetings;
-    private final ArrayList<String> jokes; 
+    private final ArrayList<String> jokes;
     private final ArrayList<String> goodbye;
     private final ArrayList<String> defaultReply;
     private final ArrayList<String> sorry;
@@ -478,14 +478,10 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        /* Set the Windows look and feel */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Metal".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -494,16 +490,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ChatBotGUI_V2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
-        //</editor-fold>
-        //</editor-fold>
-
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            // Splash screen time
-            try {
-                Thread.sleep(800);
-            } catch (InterruptedException e) {
-            }
             ChatBotGUI_V2 frame = new ChatBotGUI_V2();
             frame.setVisible(true);
             // set icon
@@ -517,8 +505,11 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
-                    // Get input
+                    // Get user input and filter it, if input is empty do nothing.
                     input = inputField.getText();
+                    if (input.equals("")) {
+                        return;
+                    }
                     filteredInput = input.toLowerCase().replaceAll("[^A-Za-z0-9' ]", "").trim();
 
                     // Display input
@@ -559,6 +550,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         resetInputField();
                         return;
                     }
+                    // Checks if input is a set question
                     for (Map.Entry question : questionAnswer.entrySet()) {
                         String key = "" + question.getKey();
                         if (filteredInput.equals(key)) {
@@ -568,7 +560,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         }
                     }
 
-                    // Reply
+                    // Commands that require String manipulation
                     if (filteredInput.contains("set alarm")) {
                         alarmTime = input.substring(10);
                         doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + alarmTime + "\n", null);
@@ -602,6 +594,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         if (!valid) {
                             doc.insertString(doc.getLength(), "Chatbot: Error No such question" + "\n", null);
                         }
+                    // Normal replies
                     } else if (filteredInput.contains("hello") || filteredInput.contains("hi") || filteredInput.contains("sup") || filteredInput.contains("hey") || filteredInput.contains("annyeong")) {
                         typingStatus.setText("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
@@ -669,6 +662,8 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 + "clear\t\t\t\t\t\t- Clears the screen\n"
                 + "encode\t\t\t\t\t- Converts decimal number to binary/hex\n"
                 + "decode <bin/hex> <base>\t\t- Converts a binary/hex to decimal\n"
+                + "set question\t\t\t\t- Set/update a question\n"
+                + "list questions\t\t\t\t- Lists all the set questions\n"
                 + "coinflip\t\t\t\t\t- Flips a coin\n"
                 + "joke\t\t\t\t\t\t- Tells a joke\n"
                 + "mc dir\t\t\t\t\t- Choose your music directory\n"
@@ -677,7 +672,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                 + "mc resume\t\t\t\t\t- Resume the music\n"
                 + "mc next\t\t\t\t\t- Plays the next song\n"
                 + "mc prev\t\t\t\t\t- Plays the previous song\n"
-                + "mc change dir\t\t\t\t- Change music dir"
+                + "mc change dir\t\t\t\t- Change music dir\n"
                 + "alarm\t\t\t\t\t\t- Displays any alarm set\n"
                 + "set alarm 00:00:00 AM/PM\t\t- Set at entered time\n"
                 + "dismiss alarm\t\t\t\t- Dismiss any alarm set\n"
