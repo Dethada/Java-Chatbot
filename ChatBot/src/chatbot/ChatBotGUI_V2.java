@@ -59,11 +59,13 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
     private final ArrayList<String> defaultReply;
     private final ArrayList<String> sorry;
     // RNG
-    private final Random randomGenerator;
+    private final RNG rngReply;
+    private final RNG rngTime;
 
     public ChatBotGUI_V2() {
         this.alarmTime = "";
-        this.randomGenerator = new Random();
+        this.rngReply = new RNG();
+        this.rngTime = new RNG();
         this.mc = new Music();
         this.mcAlarm = new Music();
         this.date = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
@@ -602,44 +604,44 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                         }
                     } else if (filteredInput.contains("hello") || filteredInput.contains("hi") || filteredInput.contains("sup") || filteredInput.contains("hey") || filteredInput.contains("annyeong")) {
                         typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(randomGenerator.nextInt(251) + 500);
+                        Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
-                        doc.insertString(doc.getLength(), "Chatbot: " + greetings.get(randomGenerator.nextInt(greetings.size())) + "\n", null);
+                        doc.insertString(doc.getLength(), "Chatbot: " + greetings.get(rngReply.getNum(greetings.size())) + "\n", null);
                     } else if (filteredInput.contains("what is your name")) {
                         typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(randomGenerator.nextInt(251) + 500);
+                        Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: I don't have a name I'm just called Chatbot\n", null);
                     } else if (filteredInput.contains("bye")) {
                         typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(randomGenerator.nextInt(251) + 500);
+                        Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
-                        doc.insertString(doc.getLength(), "Chatbot: " + goodbye.get(randomGenerator.nextInt(goodbye.size())) + "\n", null);
+                        doc.insertString(doc.getLength(), "Chatbot: " + goodbye.get(rngReply.getNum(goodbye.size())) + "\n", null);
                     } else if (filteredInput.contains("sorry")) {
                         typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(randomGenerator.nextInt(251) + 500);
+                        Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
-                        doc.insertString(doc.getLength(), "Chatbot: " + sorry.get(randomGenerator.nextInt(sorry.size())) + "\n", null);
+                        doc.insertString(doc.getLength(), "Chatbot: " + sorry.get(rngReply.getNum(sorry.size())) + "\n", null);
                     } else if (filteredInput.contains("i love you")) {
                         typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(randomGenerator.nextInt(501) + 500);
+                        Thread.sleep(rngTime.getNum(501) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: Aww love you too <3\n", null);
                     } else if (filteredInput.contains("how are you")) {
                         typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(randomGenerator.nextInt(251) + 500);
+                        Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: I'm doing well thankyou\n", null);
                     } else if (filteredInput.contains("thanks") || filteredInput.contains("thx")) {
                         typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(randomGenerator.nextInt(251) + 500);
+                        Thread.sleep(rngTime.getNum(251) + 500);
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: No problem!\n", null);
                     } else if (filteredInput.contains("joke") || filteredInput.contains("cheer me up")) {
                         typingStatus.setText("Chatbot is typing...");
-                        Thread.sleep(randomGenerator.nextInt(501) + 500);
+                        Thread.sleep(rngTime.getNum(501) + 500);
                         typingStatus.setText("");
-                        doc.insertString(doc.getLength(), "Chatbot: " + jokes.get(randomGenerator.nextInt(jokes.size())) + "\n", null);
+                        doc.insertString(doc.getLength(), "Chatbot: " + jokes.get(rngReply.getNum(jokes.size())) + "\n", null);
                     } else {
                         chatbot();
                     }
@@ -742,7 +744,9 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     doc.insertString(doc.getLength(), "Chatbot: Music directory choosen " + mc.folder + "\n", null);
                     break;
                 case "uv":
+                    typingStatus.setText("Getting data...");
                     doc.insertString(doc.getLength(), Methods.getData(), null);
+                    typingStatus.setText("");
                     break;
                 case "alarm":
                     if (!alarmTime.equals("")) {
@@ -765,7 +769,7 @@ public class ChatBotGUI_V2 extends javax.swing.JFrame {
                     doc.insertString(doc.getLength(), "Chatbot: Music directory changed\n", null);
                     break;
                 default:
-                    doc.insertString(doc.getLength(), "Chatbot: " + defaultReply.get(randomGenerator.nextInt(defaultReply.size())) + "\n", null);
+                    doc.insertString(doc.getLength(), "Chatbot: " + defaultReply.get(rngReply.getNum(defaultReply.size())) + "\n", null);
                     break;
             } // switch
         } catch (BadLocationException | IOException ex) {
