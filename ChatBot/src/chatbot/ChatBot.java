@@ -782,7 +782,7 @@ public class ChatBot extends javax.swing.JFrame {
                     break;
                 case "uv":
                     typingStatus.setText("Getting data...");
-                    doc.insertString(doc.getLength(), Methods.getData(), null);
+                    doc.insertString(doc.getLength(), Methods.uvLevels(), null);
                     typingStatus.setText("");
                     break;
                 case "alarm":

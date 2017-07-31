@@ -4,9 +4,6 @@
 package chatbot;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -50,18 +47,15 @@ public class Methods {
         return (flip[randomGenerator.nextInt(2)]);
     }
 
-    // Gets current uv levels
-    public static String getData() {
+    // Sends get request to url
+    public static String getData(String url, String header, String value) {
         String json = "", output;
-        Index index;
-        String level;
-        Gson gson = new Gson();
 
         try {
 
             DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpGet getRequest = new HttpGet("https://api.data.gov.sg/v1/environment/uv-index");
-            getRequest.addHeader("api-key", "EPIFphWuoUyovMc6GGbJTm91B4JzAkE5");
+            HttpGet getRequest = new HttpGet(url);
+            getRequest.addHeader(header, value);
 
             HttpResponse response = httpClient.execute(getRequest);
 
@@ -83,25 +77,33 @@ public class Methods {
             return "Chatbot: Error IOException occured\n";
         }
 
-        UV uvAPI = gson.fromJson(json, UV.class);
-        Items[] array = uvAPI.getItems();
-        String items = array[0] + "";
-        JsonElement jelement = new JsonParser().parse(items);
-        JsonArray jarray = jelement.getAsJsonArray();
+        return json;
+    }
+
+    // Gets current uv levels
+    public static String uvLevels() {
+        Gson gson = new Gson();
+        String output;
+        String data = getData("https://api.data.gov.sg/v1/environment/uv-index", "api-key", "EPIFphWuoUyovMc6GGbJTm91B4JzAkE5");
+
+        // Returns error message if any
+        if (data.contains("Chatbot:")) {
+            return data;
+        }
+
+        UV uvAPI = gson.fromJson(data, UV.class);
+        Index[] indexArray = uvAPI.getItems()[0].getIndex();
 
         output = "";
 
-        for (int i = 0; i < jarray.size(); i++) {
-            index = gson.fromJson(jarray.get(i), Index.class);
-
-            String time = index.getTimestamp();
-            time = time.substring(11, time.length() - 12); // formats the time
-            String morn_night = "AM";
-            int intTime = Integer.parseInt(time);
+        for (Index index : indexArray) {
+            int uvLevel = Integer.parseInt(index.getValue());
+            int intTime = Integer.parseInt(index.getTimestamp().substring(11, 13));
+            String am_pm = "AM", level;
 
             // Check is am or pm
             if (intTime >= 12) {
-                morn_night = "PM";
+                am_pm = "PM";
                 intTime -= 12;
                 if (intTime == 0) {
                     intTime = 12;
@@ -109,60 +111,41 @@ public class Methods {
             }
 
             // Checks uv level
-            if (Integer.parseInt(index.getValue()) <= 3) {
+            if (uvLevel <= 3) {
                 level = "Low";
-            } else if (Integer.parseInt(index.getValue()) <= 5) {
+            } else if (uvLevel <= 5) {
                 level = "Mod";
-            } else if (Integer.parseInt(index.getValue()) <= 7) {
+            } else if (uvLevel <= 7) {
                 level = "High";
-            } else if (Integer.parseInt(index.getValue()) <= 10) {
+            } else if (uvLevel <= 10) {
                 level = "Very High";
             } else {
                 level = "Extreme";
             }
 
-            output += "UV index at " + intTime + " " + morn_night + " is " + index.getValue() + " (" + level + ")\n";
-        } // for
+            output += "UV index at " + intTime + " " + am_pm + " is " + uvLevel + " (" + level + ")\n";
+        }
 
         return output;
     }
 
     public static String getQuote() {
-        String json = "", output, author;
+        String data, author;
         Gson gson = new Gson();
 
-        try {
-
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpGet getRequest = new HttpGet("https://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=jsonp&jsonp=?");
-
-            HttpResponse response = httpClient.execute(getRequest);
-
-            if (response.getStatusLine().getStatusCode() != 200) {
-                return "Chatbot: received HTTP error code : " + response.getStatusLine().getStatusCode();
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-
-            while ((output = br.readLine()) != null) {
-                json = output;
-            }
-
-            httpClient.getConnectionManager().shutdown();
-
-        } catch (ClientProtocolException e) {
-            return "Chatbot: check your internet connection\n";
-        } catch (IOException e) {
-            return "Chatbot: Error IOException occured\n";
+        data = getData("https://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=jsonp&jsonp=?", "", "");
+        if (data.contains("Chatbot:")) {
+            return data;
         }
 
-        json = json.substring(2, json.length() - 1);
-        Quote quote = gson.fromJson(json, Quote.class);
+        data = data.substring(2, data.length() - 1);
+        Quote quote = gson.fromJson(data, Quote.class);
         if (quote.getQuoteAuthor().equals("")) {
             author = "Unknown";
         } else {
             author = quote.getQuoteAuthor();
         }
+        
         return "\"" + quote.getQuoteText() + "\"" + " - " + author;
     }
 
@@ -200,14 +183,14 @@ public class Methods {
 
     // Checks if the main string provided contains the strings to be checked
     public static boolean checkContains(String main, String... checks) {
-        for (String s:checks) {
+        for (String s : checks) {
             if (main.contains(s)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     // Filters out non-alphanumeric characters and replaces shortforms
     public static String filter(String text) {
         String filtered;
