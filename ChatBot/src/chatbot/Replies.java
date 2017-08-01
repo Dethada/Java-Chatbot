@@ -34,7 +34,6 @@ public class Replies {
         this.rngReply = new RNG();
         this.rngTime = new RNG();
 
-
         // Read stored replies from file
         greetings = Methods.readFile(System.getProperty("user.dir") + "\\replies\\greetings.txt");
         jokes = Methods.readFile(System.getProperty("user.dir") + "\\replies\\jokes.txt");

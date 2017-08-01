@@ -17,20 +17,7 @@ public class Index {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public String getValue() {
         return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return "{\"timestamp\":" + "\"" + timestamp + "\"" + ", \"value\":" + value + "}";
     }
 }

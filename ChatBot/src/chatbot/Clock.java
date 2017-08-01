@@ -5,6 +5,9 @@ package chatbot;
 
 import static chatbot.ChatBot.doc;
 import static chatbot.ChatBot.mc;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,6 +15,8 @@ import java.time.format.FormatStyle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 
 /**
  *
@@ -25,26 +30,28 @@ public class Clock {
     private String currentDate;
     private String currentTime;
     private String alarmTime;
-    private final Music mcAlarm;
+
+    private FileInputStream FIS;
+    private BufferedInputStream BIS;
+    private Player player;
 
     public Clock() {
         this.alarmTime = "";
-        this.mcAlarm = new Music();
         this.dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
         this.timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
         start();
     }
-    
+
     public void setAlarmTime(String time) {
         alarmTime = time;
     }
-    
+
     public String getAlarmTime() {
         return alarmTime;
     }
-    
+
     public void stopAlarm() {
-        mcAlarm.Stop();
+        stop();
     }
 
     private void start() {
@@ -73,14 +80,48 @@ public class Clock {
                         }
                         mc.Pause();
                         System.out.println(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
-                        mcAlarm.Play(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
+                        ring(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
                         ChatBot.setmusicDisplay("Alarm ringing");
                         ChatBot.setnotiBarChat("Alarm ringing");
                         ChatBot.setmusicStatus("Alarm ringing");
                     }
-
                 } // for
             } // run()
         }.start();
+    }
+
+    public void ring(String path) {
+        try {
+            FIS = new FileInputStream(path);
+            BIS = new BufferedInputStream(FIS);
+
+            player = new Player(BIS);
+
+        } catch (FileNotFoundException | JavaLayerException ex) {
+        }
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    player.play();
+
+                    if (player.isComplete()) {
+                    }
+                } catch (JavaLayerException ex) {
+                }
+            }
+        }.start();
+    }
+    
+    public void stop() {
+        if (player != null) {
+            player.close();
+
+            ChatBot.setmusicDisplay("Open your music folder to play songs");
+            ChatBot.setnotiBarChat("Remeber to key in your ATS!");
+            ChatBot.setmusicStatus("Stopped");
+            ChatBot.setnoOfSongs("");
+        }
     }
 }
