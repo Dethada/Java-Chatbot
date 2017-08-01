@@ -72,6 +72,7 @@ public class Clock {
                             Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         mc.Pause();
+                        System.out.println(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
                         mcAlarm.Play(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
                         ChatBot.setmusicDisplay("Alarm ringing");
                         ChatBot.setnotiBarChat("Alarm ringing");

@@ -43,7 +43,7 @@ public class Methods {
     public static String coinFlip() {
         Random randomGenerator = new Random();
 
-        String[] flip = {"heads", "tails"};
+        String[] flip = {"Heads", "Tails"};
         return (flip[randomGenerator.nextInt(2)]);
     }
 
