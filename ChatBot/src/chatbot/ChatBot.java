@@ -1,5 +1,5 @@
 /*
- * Main class for the chatbot
+ * Main class for the commands
  */
 package chatbot;
 
@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,24 +32,17 @@ public class ChatBot extends javax.swing.JFrame {
     /**
      * Creates new form ChatBotGUI_V2
      */
-    private final Music mc;
-    private final Music mcAlarm;
-    // for alarm clock
-    DateTimeFormatter date;
-    DateTimeFormatter time;
-    LocalDateTime currentDateTime;
-    String currentDate;
-    private String currentTime;
-    private String alarmTime;
+    static Music mc;
+    static Clock clock;
     // inputs
     private String input;
     private String filteredInput;
     // For font color
-    private final StyledDocument doc;
+    static StyledDocument doc;
     private final Style orange;
     private final Style white;
     // Replies
-    private HashMap<String, String> questionAnswer;
+    private Questions questions;
     private final ArrayList<String> greetings;
     private final ArrayList<String> jokes;
     private final ArrayList<String> goodbye;
@@ -63,14 +53,12 @@ public class ChatBot extends javax.swing.JFrame {
     private final RNG rngTime;
 
     public ChatBot() {
-        this.alarmTime = "";
+        initComponents();
+        clock = new Clock();
         this.rngReply = new RNG();
         this.rngTime = new RNG();
         this.mc = new Music();
-        this.mcAlarm = new Music();
-        this.date = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
-        this.time = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
-        initComponents();
+        this.questions = new Questions("questions.ser");
 
         // Set font color
         doc = chatArea.getStyledDocument();
@@ -87,7 +75,7 @@ public class ChatBot extends javax.swing.JFrame {
         sorry = Methods.readFile(System.getProperty("user.dir") + "\\replies\\sorry.txt");
 
         if (mc.getProp("fileChoosen").equals("yes")) {
-            Display.setText("Click the three dots to start");
+            musicDisplay.setText("Click the three dots to start");
         }
 
         // Initiate convo
@@ -97,51 +85,6 @@ public class ChatBot extends javax.swing.JFrame {
                     + Methods.getQuote() + "\n", null);
         } catch (BadLocationException e) {
             System.out.println(e);
-        }
-
-        // Clock
-        new Thread("Clock") {
-            @Override
-            public void run() {
-                while (true) {
-                    currentDateTime = LocalDateTime.now();
-                    currentTime = time.format(currentDateTime);
-                    currentDate = date.format(currentDateTime);
-
-                    clock.setText(time.format(currentDateTime));
-                    displayDate.setText(currentDate);
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                    }
-
-                    if (currentTime.equals(alarmTime)) {
-                        try {
-                            doc.insertString(doc.getLength(), "Chatbot: Alarm rang at " + currentTime + "\n", null);
-                        } catch (BadLocationException ex) {
-                            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        mc.Pause();
-                        mcAlarm.Play(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
-                        Display.setText("Alarm ringing");
-                        notiBarChat.setText("Alarm ringing");
-                        musicStatus.setText("Alarm ringing");
-                    }
-
-                } // for
-            } // run()
-        }.start();
-
-        // Read questions from file
-        try {
-            FileInputStream fileIn = new FileInputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            questionAnswer = (HashMap<String, String>) in.readObject();
-            in.close();
-            fileIn.close();
-        } catch (IOException | ClassNotFoundException i) {
-            JOptionPane.showMessageDialog(rootPane, "questions.ser might be missing", "Error", 0);
         }
     }
 
@@ -154,8 +97,6 @@ public class ChatBot extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        questionField = new javax.swing.JTextField();
-        answerField = new javax.swing.JTextField();
         mainPanel = new javax.swing.JPanel();
         homePanel = new javax.swing.JPanel();
         noOfSongs = new javax.swing.JLabel();
@@ -164,11 +105,11 @@ public class ChatBot extends javax.swing.JFrame {
         homeButtonHome = new javax.swing.JLabel();
         chatButtonHome = new javax.swing.JLabel();
         displayDate = new javax.swing.JLabel();
-        clock = new javax.swing.JLabel();
+        time = new javax.swing.JLabel();
         play = new javax.swing.JLabel();
         pause = new javax.swing.JLabel();
         stop = new javax.swing.JLabel();
-        Display = new javax.swing.JLabel();
+        musicDisplay = new javax.swing.JLabel();
         next = new javax.swing.JLabel();
         previous = new javax.swing.JLabel();
         choose = new javax.swing.JLabel();
@@ -234,11 +175,11 @@ public class ChatBot extends javax.swing.JFrame {
         displayDate.setText("Sunday, 7 May, 2017");
         homePanel.add(displayDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 270, 1060, 60));
 
-        clock.setFont(new java.awt.Font("DS-Digital", 0, 150)); // NOI18N
-        clock.setForeground(new java.awt.Color(255, 255, 255));
-        clock.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        clock.setText("6:23:25 PM");
-        homePanel.add(clock, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 1070, 310));
+        time.setFont(new java.awt.Font("DS-Digital", 0, 150)); // NOI18N
+        time.setForeground(new java.awt.Color(255, 255, 255));
+        time.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        time.setText("6:23:25 PM");
+        homePanel.add(time, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 1070, 310));
 
         play.setToolTipText("Play");
         play.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -267,11 +208,11 @@ public class ChatBot extends javax.swing.JFrame {
         });
         homePanel.add(stop, new org.netbeans.lib.awtextra.AbsoluteConstraints(589, 539, 60, 60));
 
-        Display.setFont(new java.awt.Font("Serif", 0, 36)); // NOI18N
-        Display.setForeground(new java.awt.Color(255, 255, 255));
-        Display.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Display.setText("Open your music folder to play songs");
-        homePanel.add(Display, new org.netbeans.lib.awtextra.AbsoluteConstraints(411, 423, 600, 50));
+        musicDisplay.setFont(new java.awt.Font("Serif", 0, 36)); // NOI18N
+        musicDisplay.setForeground(new java.awt.Color(255, 255, 255));
+        musicDisplay.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        musicDisplay.setText("Open your music folder to play songs");
+        homePanel.add(musicDisplay, new org.netbeans.lib.awtextra.AbsoluteConstraints(411, 423, 600, 50));
 
         next.setToolTipText("Next");
         next.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -464,23 +405,23 @@ public class ChatBot extends javax.swing.JFrame {
     }//GEN-LAST:event_previousMouseReleased
 
     private void snoozeHomeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_snoozeHomeMouseReleased
-        if (!alarmTime.equals("")) {
+        if (!clock.getAlarmTime().equals("")) {
             JOptionPane.showMessageDialog(null, "Alarm dismissed");
         } else {
             JOptionPane.showMessageDialog(null, "No alarms to dismiss");
         }
-        mcAlarm.Stop();
-        alarmTime = "";
+        clock.stopAlarm();
+        clock.setAlarmTime("");
     }//GEN-LAST:event_snoozeHomeMouseReleased
 
     private void snoozeChatMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_snoozeChatMouseReleased
-        if (!alarmTime.equals("")) {
+        if (!clock.getAlarmTime().equals("")) {
             JOptionPane.showMessageDialog(null, "Alarm dismissed");
         } else {
             JOptionPane.showMessageDialog(null, "No alarms to dismiss");
         }
-        mcAlarm.Stop();
-        alarmTime = "";
+        clock.stopAlarm();
+        clock.setAlarmTime("");
     }//GEN-LAST:event_snoozeChatMouseReleased
 
     public static void main(String args[]) {
@@ -521,55 +462,23 @@ public class ChatBot extends javax.swing.JFrame {
                     // Display input
                     doc.insertString(doc.getLength(), "You: " + input + "\n", orange);
 
-                    // Allow user to add question and answer
+                    // Allow user to add questions and answer
                     if (filteredInput.equals("set question")) {
-                        Object[] input = {"Question:", questionField, "Answer:", answerField};
-
-                        int option = JOptionPane.showConfirmDialog(rootPane, input, "Set Question", JOptionPane.OK_CANCEL_OPTION);
-                        if (option == JOptionPane.OK_OPTION) {
-                            String questionText = Methods.filter(questionField.getText());
-                            String answerText = answerField.getText();
-                            if (!questionText.isEmpty() && !answerText.isEmpty()) {
-                                questionAnswer.put(questionText, answerText);
-                                questionField.setText("");
-                                answerField.setText("");
-                                try {
-                                    FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
-                                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                                    out.writeObject(questionAnswer);
-                                    out.close();
-                                    fileOut.close();
-                                    doc.insertString(doc.getLength(), "Chatbot: Question successfully added" + "\n", null);
-                                } catch (IOException i) {
-                                    doc.insertString(doc.getLength(), "Chatbot: IOException Error" + "\n", null);
-                                }
-                            } else {
-                                doc.insertString(doc.getLength(), "Chatbot: Invalid input" + "\n", null);
-                            }
-                        } else {
-                            doc.insertString(doc.getLength(), "Chatbot: Cancelled" + "\n", null);
-                            questionField.setText("");
-                            answerField.setText("");
-                            resetInputField();
-                            return;
-                        }
+                        doc.insertString(doc.getLength(), "Chatbot: " + questions.setQuestion() + "\n", null);
                         resetInputField();
                         return;
                     }
-                    // Checks if input is a set question, reply with set answer if it is
-                    for (Map.Entry question : questionAnswer.entrySet()) {
-                        String key = "" + question.getKey();
-                        if (filteredInput.equals(key)) {
-                            doc.insertString(doc.getLength(), "Chatbot: " + question.getValue() + "\n", null);
-                            resetInputField();
-                            return;
-                        }
+                    // Checks if input is a set questions, reply with set answer if it is
+                    if (!questions.answer(filteredInput).isEmpty()) {
+                        doc.insertString(doc.getLength(), "Chatbot: " + questions.answer(filteredInput) + "\n", null);
+                        resetInputField();
+                        return;
                     }
 
                     // Commands that require String manipulation
                     if (filteredInput.contains("set alarm")) {
-                        alarmTime = input.substring(10);
-                        doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + alarmTime + "\n", null);
+                        clock.setAlarmTime(input.substring(10));
+                        doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + clock.getAlarmTime() + "\n", null);
                     } else if (filteredInput.contains("encode")) {
                         String value = input.substring(7);
                         doc.insertString(doc.getLength(), "Chatbot: " + Methods.Decimal2Bin(value) + "\n", null);
@@ -578,28 +487,7 @@ public class ChatBot extends javax.swing.JFrame {
                         String v2 = input.substring(input.length() - 1);
                         doc.insertString(doc.getLength(), "Chatbot: " + v1 + " converted to base 10 is " + Methods.decode(v1, v2) + "\n", null);
                     } else if (filteredInput.contains("remove question")) {
-                        String x = filteredInput.substring(16);
-                        boolean valid = false;
-                        for (String key : questionAnswer.keySet()) {
-                            if (x.equals(key)) {
-                                questionAnswer.remove(x);
-                                valid = true;
-                                try {
-                                    FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
-                                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                                    out.writeObject(questionAnswer);
-                                    out.close();
-                                    fileOut.close();
-                                    doc.insertString(doc.getLength(), "Chatbot: Question successfully removed" + "\n", null);
-                                } catch (IOException i) {
-                                    doc.insertString(doc.getLength(), "Chatbot: IOException Error" + "\n", null);
-                                }
-                                break;
-                            }
-                        }
-                        if (!valid) {
-                            doc.insertString(doc.getLength(), "Chatbot: Error No such question" + "\n", null);
-                        }
+                        doc.insertString(doc.getLength(), "Chatbot: " + questions.rmQuestion(filteredInput.substring(16)) + "\n", null);
                         // Normal replies
                     } else if (Methods.checkContains(filteredInput, "hello", "hi", "sup", "hey", "annyeong", "konichiwa")) {
                         typingStatus.setText("Chatbot is typing...");
@@ -676,7 +564,7 @@ public class ChatBot extends javax.swing.JFrame {
                         typingStatus.setText("");
                         doc.insertString(doc.getLength(), "Chatbot: " + jokes.get(rngReply.getNum(jokes.size())) + "\n", null);
                     } else {
-                        chatbot();
+                        commands();
                     }
 
                     resetInputField();
@@ -688,13 +576,13 @@ public class ChatBot extends javax.swing.JFrame {
     }
 
     // clear and reset input text field
-    private void resetInputField() {
+    public static void resetInputField() {
         inputField.setText("");
         inputField.requestFocus();
     }
 
     // commands
-    private void chatbot() {
+    private void commands() {
         // Help msg
         String help = "ChatBot:    Commands avaliable\n"
                 + "----------------------------------------------------\n"
@@ -739,9 +627,7 @@ public class ChatBot extends javax.swing.JFrame {
                     break;
                 case "list questions":
                     doc.insertString(doc.getLength(), "List of User added Questions\n----------------------------------------------------\n", null);
-                    for (String s : questionAnswer.keySet()) {
-                        doc.insertString(doc.getLength(), s + "\n", null);
-                    }
+                    doc.insertString(doc.getLength(), questions.questions(), null);
                     break;
                 case "mc resume":
                     mc.Resume();
@@ -786,20 +672,20 @@ public class ChatBot extends javax.swing.JFrame {
                     typingStatus.setText("");
                     break;
                 case "alarm":
-                    if (!alarmTime.equals("")) {
-                        doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + alarmTime + "\n", null);
+                    if (!clock.getAlarmTime().equals("")) {
+                        doc.insertString(doc.getLength(), "Chatbot: Alarm set at " + clock.getAlarmTime() + "\n", null);
                     } else {
                         doc.insertString(doc.getLength(), "Chatbot: No alarm set\n", null);
                     }
                     break;
                 case "dismiss alarm":
-                    if (alarmTime.equals("")) {
+                    if (clock.getAlarmTime().equals("")) {
                         doc.insertString(doc.getLength(), "Chatbot: No alarms to dismiss\n", null);
                     } else {
                         doc.insertString(doc.getLength(), "Chatbot: Alarm dismissed\n", null);
                     }
-                    mcAlarm.Stop();
-                    alarmTime = "";
+                    clock.stopAlarm();
+                    clock.setAlarmTime("");
                     break;
                 case "mc change dir":
                     mc.changeDir();
@@ -815,10 +701,58 @@ public class ChatBot extends javax.swing.JFrame {
 
     }
 
+    // Print to screen with formatting
+    public static void printf(String text) {
+        try {
+            doc.insertString(doc.getLength(), "ChatBot:" + text + "\n", null);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    // Print to screen without formatting
+    public static void print(String text) {
+        try {
+            doc.insertString(doc.getLength(), text + "\n", null);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void setTime(String text) {
+        time.setText(text);
+    }
+
+    public static void setDisplayDate(String d) {
+        displayDate.setText(d);
+    }
+
+    public static void setmusicStatus(String text) {
+        musicStatus.setText(text);
+    }
+
+    public static void setnoOfSongs(String text) {
+        noOfSongs.setText(text);
+    }
+
+    public static void setnotiBarChat(String text) {
+        notiBarChat.setText(text);
+    }
+
+    public static void setmusicDisplay(String text) {
+        musicDisplay.setText(text);
+    }
+
+    public static void settypingStatus(String text) {
+        typingStatus.setText(text);
+    }
+
+    public static String getInput() {
+        return inputField.getText();
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    static javax.swing.JLabel Display;
     private javax.swing.JScrollPane ScrollPane;
-    private javax.swing.JTextField answerField;
     private javax.swing.JLabel backgroundChat;
     private javax.swing.JLabel backgroundHome;
     private javax.swing.JTextPane chatArea;
@@ -826,26 +760,26 @@ public class ChatBot extends javax.swing.JFrame {
     private javax.swing.JLabel chatButtonHome;
     private javax.swing.JPanel chatPanel;
     private javax.swing.JLabel choose;
-    private javax.swing.JLabel clock;
-    private javax.swing.JLabel displayDate;
+    private static javax.swing.JLabel displayDate;
     private javax.swing.JLabel homeButtonChat;
     private javax.swing.JLabel homeButtonHome;
     private javax.swing.JPanel homePanel;
-    private javax.swing.JTextField inputField;
+    private static javax.swing.JTextField inputField;
     private javax.swing.JPanel mainPanel;
-    static javax.swing.JLabel musicStatus;
+    private static javax.swing.JLabel musicDisplay;
+    private static javax.swing.JLabel musicStatus;
     private javax.swing.JLabel next;
-    static javax.swing.JLabel noOfSongs;
-    static javax.swing.JLabel notiBarChat;
+    private static javax.swing.JLabel noOfSongs;
+    private static javax.swing.JLabel notiBarChat;
     private javax.swing.JLabel notiBarHome;
     private javax.swing.JLabel pause;
     private javax.swing.JLabel play;
     private javax.swing.JLabel previous;
-    private javax.swing.JTextField questionField;
     private javax.swing.JButton sendButton;
     private javax.swing.JLabel snoozeChat;
     private javax.swing.JLabel snoozeHome;
     private javax.swing.JLabel stop;
-    private javax.swing.JLabel typingStatus;
+    private static javax.swing.JLabel time;
+    private static javax.swing.JLabel typingStatus;
     // End of variables declaration//GEN-END:variables
 }

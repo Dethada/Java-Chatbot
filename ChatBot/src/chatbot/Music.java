@@ -3,10 +3,6 @@
  */
 package chatbot;
 
-import static chatbot.ChatBot.Display;
-import static chatbot.ChatBot.musicStatus;
-import static chatbot.ChatBot.noOfSongs;
-import static chatbot.ChatBot.notiBarChat;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,16 +53,16 @@ public class Music {
             player.close();
             playing = false;
 
-            Display.setText("Open your music folder to play songs");
-            notiBarChat.setText("Remeber to key in your ATS!");
-            musicStatus.setText("Stopped");
-            noOfSongs.setText("");
+            ChatBot.setmusicDisplay("Open your music folder to play songs");
+            ChatBot.setnotiBarChat("Remeber to key in your ATS!");
+            ChatBot.setmusicStatus("Stopped");
+            ChatBot.setnoOfSongs("");
         }
     }
 
     public void Pause() {
         if (player != null) {
-            musicStatus.setText("Paused");
+            ChatBot.setmusicStatus("Paused");
             playing = false;
             try {
                 pauseLocation = FIS.available();
@@ -262,10 +258,10 @@ public class Music {
     }
 
     private void setDisplayPlaying() {
-        Display.setText(currentSong.substring(0, currentSong.length() - 4));
-        notiBarChat.setText(currentSong.substring(0, currentSong.length() - 4));
-        musicStatus.setText("Playing");
-        noOfSongs.setText(songNo + 1 + "/" + playList.size());
+        ChatBot.setmusicDisplay(currentSong.substring(0, currentSong.length() - 4));
+        ChatBot.setnotiBarChat(currentSong.substring(0, currentSong.length() - 4));
+        ChatBot.setmusicStatus("Playing");
+        ChatBot.setnoOfSongs(songNo + 1 + "/" + playList.size());
     }
 
 } // End Music class
