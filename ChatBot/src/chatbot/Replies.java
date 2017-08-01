@@ -55,7 +55,7 @@ public class Replies {
                     filteredInput = Methods.filter(input);
 
                     // Display input
-                    ChatBot.userPrint(input);
+                    ChatBot.userPrintf(input);
 
                     // Allow user to add questions and answer
                     if (filteredInput.equals("set question")) {

@@ -3,7 +3,6 @@
  */
 package chatbot;
 
-import static chatbot.ChatBot.doc;
 import static chatbot.ChatBot.mc;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -12,9 +11,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.text.BadLocationException;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
@@ -50,12 +46,7 @@ public class Clock {
         return alarmTime;
     }
 
-    public void stopAlarm() {
-        stop();
-    }
-
     private void start() {
-        // Clock
         new Thread("Clock") {
             @Override
             public void run() {
@@ -73,13 +64,8 @@ public class Clock {
                     }
 
                     if (currentTime.equals(alarmTime)) {
-                        try {
-                            doc.insertString(doc.getLength(), "Chatbot: Alarm rang at " + currentTime + "\n", null);
-                        } catch (BadLocationException ex) {
-                            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                        ChatBot.printf("Alarm rang at " + currentTime);
                         mc.Pause();
-                        System.out.println(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
                         ring(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
                         ChatBot.setmusicDisplay("Alarm ringing");
                         ChatBot.setnotiBarChat("Alarm ringing");
@@ -90,7 +76,8 @@ public class Clock {
         }.start();
     }
 
-    public void ring(String path) {
+    // Sound the alarm
+    private void ring(String path) {
         try {
             FIS = new FileInputStream(path);
             BIS = new BufferedInputStream(FIS);
@@ -113,8 +100,8 @@ public class Clock {
             }
         }.start();
     }
-    
-    public void stop() {
+
+    public void stopAlarm() {
         if (player != null) {
             player.close();
 

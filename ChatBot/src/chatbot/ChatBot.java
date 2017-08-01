@@ -25,7 +25,7 @@ public class ChatBot extends javax.swing.JFrame {
     static Clock clock;
     private final Replies replies;
     // For font color
-    static StyledDocument doc;
+    private static StyledDocument doc;
     private static Style orange;
     private final Style white;
 
@@ -437,7 +437,8 @@ public class ChatBot extends javax.swing.JFrame {
         }
     }
 
-    public static void userPrint(String text) {
+    // Prints to screen with user's font color
+    public static void userPrintf(String text) {
         try {
             doc.insertString(doc.getLength(), "You: " + text + "\n", orange);
         } catch (BadLocationException ex) {

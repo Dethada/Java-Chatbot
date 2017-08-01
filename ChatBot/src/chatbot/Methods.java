@@ -145,7 +145,7 @@ public class Methods {
         } else {
             author = quote.getQuoteAuthor();
         }
-        
+
         return "\"" + quote.getQuoteText() + "\"" + " - " + author;
     }
 
