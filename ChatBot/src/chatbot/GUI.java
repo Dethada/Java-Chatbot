@@ -19,7 +19,7 @@ import javax.swing.text.StyledDocument;
  *
  * @author David
  */
-public class ChatBot extends javax.swing.JFrame {
+public class GUI extends javax.swing.JFrame {
 
     static Music mc;
     static Clock clock;
@@ -29,7 +29,7 @@ public class ChatBot extends javax.swing.JFrame {
     private static Style orange;
     private final Style white;
 
-    public ChatBot() {
+    public GUI() {
         initComponents();
         clock = new Clock();
         this.replies = new Replies();
@@ -333,20 +333,20 @@ public class ChatBot extends javax.swing.JFrame {
     }//GEN-LAST:event_chatButtonHomeMouseReleased
 
     private void stopMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stopMouseReleased
-        mc.Stop();
+        mc.stop();
         mc.stopped = true;
     }//GEN-LAST:event_stopMouseReleased
 
     private void playMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_playMouseReleased
         try {
-            mc.Resume();
+            mc.resume();
         } catch (IOException ex) {
-            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_playMouseReleased
 
     private void pauseMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pauseMouseReleased
-        mc.Pause();
+        mc.pause();
     }//GEN-LAST:event_pauseMouseReleased
 
     private void chooseMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chooseMouseReleased
@@ -360,13 +360,13 @@ public class ChatBot extends javax.swing.JFrame {
     }//GEN-LAST:event_chooseMouseReleased
 
     private void nextMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_nextMouseReleased
-        mc.Stop();
+        mc.stop();
         mc.next();
     }//GEN-LAST:event_nextMouseReleased
 
     private void previousMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_previousMouseReleased
         if (mc.songNo > 0) {
-            mc.Stop();
+            mc.stop();
             mc.prev();
         }
     }//GEN-LAST:event_previousMouseReleased
@@ -401,12 +401,12 @@ public class ChatBot extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ChatBot.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            ChatBot frame = new ChatBot();
+            GUI frame = new GUI();
             frame.setVisible(true);
             // set icon
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(System.getProperty("user.dir") + "\\images\\icon.png"));
@@ -424,7 +424,7 @@ public class ChatBot extends javax.swing.JFrame {
         try {
             doc.insertString(doc.getLength(), text + "\n", null);
         } catch (BadLocationException ex) {
-            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -433,7 +433,7 @@ public class ChatBot extends javax.swing.JFrame {
         try {
             doc.insertString(doc.getLength(), "ChatBot: " + text + "\n", null);
         } catch (BadLocationException ex) {
-            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -442,7 +442,7 @@ public class ChatBot extends javax.swing.JFrame {
         try {
             doc.insertString(doc.getLength(), "You: " + text + "\n", orange);
         } catch (BadLocationException ex) {
-            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

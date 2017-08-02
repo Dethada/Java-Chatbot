@@ -3,9 +3,14 @@
  */
 package chatbot;
 
-import static chatbot.ChatBot.clock;
-import static chatbot.ChatBot.mc;
+import static chatbot.GUI.clock;
+import static chatbot.GUI.mc;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +24,7 @@ public class Replies {
 
     private String input;
     private String filteredInput;
-    private final Questions questions;
+    private ArrayList<Question> questions;
     private final ArrayList<String> greetings;
     private final ArrayList<String> jokes;
     private final ArrayList<String> goodbye;
@@ -28,11 +33,14 @@ public class Replies {
     // RNG
     private final RNG rngReply;
     private final RNG rngTime;
+    private final javax.swing.JTextField questionField;
+    private final javax.swing.JTextField answerField;
 
     public Replies() {
-        this.questions = new Questions("questions.ser");
         this.rngReply = new RNG();
         this.rngTime = new RNG();
+        questionField = new javax.swing.JTextField();
+        answerField = new javax.swing.JTextField();
 
         // Read stored replies from file
         greetings = Methods.readFile(System.getProperty("user.dir") + "\\replies\\greetings.txt");
@@ -40,6 +48,17 @@ public class Replies {
         goodbye = Methods.readFile(System.getProperty("user.dir") + "\\replies\\goodbye.txt");
         defaultReply = Methods.readFile(System.getProperty("user.dir") + "\\replies\\default.txt");
         sorry = Methods.readFile(System.getProperty("user.dir") + "\\replies\\sorry.txt");
+
+        //Read question objects from file
+        try {
+            FileInputStream fileIn = new FileInputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            questions = (ArrayList<Question>) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (IOException | ClassNotFoundException i) {
+            JOptionPane.showMessageDialog(null, "questions.ser might be missing", "Error", 0);
+        }
     }
 
     public void getReply() {
@@ -48,122 +67,154 @@ public class Replies {
             public void run() {
                 try {
                     // Get user input and filter it, if input is empty do nothing.
-                    input = ChatBot.getInput();
+                    input = GUI.getInput();
                     if (input.equals("")) {
                         return;
                     }
                     filteredInput = Methods.filter(input);
 
                     // Display input
-                    ChatBot.userPrintf(input);
+                    GUI.userPrintf(input);
 
                     // Allow user to add questions and answer
                     if (filteredInput.equals("set question")) {
-                        ChatBot.printf(questions.setQuestion());
-                        ChatBot.resetInputField();
+                        Object[] input = {"Question:", questionField, "Answer:", answerField};
+
+                        int option = JOptionPane.showConfirmDialog(null, input, "Set Question", JOptionPane.OK_CANCEL_OPTION);
+                        if (option == JOptionPane.OK_OPTION) {
+                            String questionText = Methods.filter(questionField.getText());
+                            String answerText = answerField.getText();
+                            if (!questionText.isEmpty() && !answerText.isEmpty()) {
+                                questions.add(new Question(questionText, answerText));
+
+                                questionField.setText("");
+                                answerField.setText("");
+                                writeObject();
+                                GUI.printf("Question successfully added");
+                            } else {
+                                GUI.printf("Invalid input");
+                            }
+                        } else {
+                            questionField.setText("");
+                            answerField.setText("");
+                            GUI.printf("Cancelled");
+                        }
+                        GUI.resetInputField();
                         return;
                     }
                     // Checks if input is a set questions, reply with set answer if it is
-                    if (!questions.answer(filteredInput).isEmpty()) {
-                        ChatBot.printf(questions.answer(filteredInput));
-                        ChatBot.resetInputField();
-                        return;
+                    for (int i = 0; i < questions.size(); i++) {
+                        if (filteredInput.equals(questions.get(i).getQuestion())) {
+                            String[] y = questions.get(i).getAnswer();
+                            if (y.length > 1) {
+                                GUI.printf(y[rngReply.getNum(y.length)]);
+                            } else {
+                                GUI.printf(y[0]);
+                            }
+                            GUI.resetInputField();
+                            return;
+                        }
                     }
 
                     // Commands that require String manipulation
                     if (filteredInput.contains("set alarm")) {
                         clock.setAlarmTime(input.substring(10));
-                        ChatBot.printf("Alarm set at " + clock.getAlarmTime());
+                        GUI.printf("Alarm set at " + clock.getAlarmTime());
                     } else if (filteredInput.contains("encode")) {
-                        ChatBot.printf(Methods.Decimal2Bin(input.substring(7)));
+                        GUI.printf(Methods.Decimal2Bin(input.substring(7)));
                     } else if (filteredInput.contains("decode")) {
                         String v1 = input.substring(7, input.length() - 2);
                         String v2 = input.substring(input.length() - 1);
-                        ChatBot.printf(v1 + " converted to base 10 is " + Methods.decode(v1, v2));
+                        GUI.printf(v1 + " converted to base 10 is " + Methods.decode(v1, v2));
                     } else if (filteredInput.contains("remove question")) {
-                        ChatBot.printf(questions.rmQuestion(filteredInput.substring(16)));
+                        for (int i = 0; i < questions.size(); i++) {
+                            if (filteredInput.substring(16).equals(questions.get(i).getQuestion())) {
+                                questions.remove(i);
+                                GUI.printf("Question successfully removed");
+                            }
+                        }
                         // Normal replies
                     } else if (Methods.checkContains(filteredInput, "hello", "hi", "sup", "hey", "annyeong", "konichiwa")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf(greetings.get(rngReply.getNum(greetings.size())));
+                        GUI.settypingStatus("");
+                        GUI.printf(greetings.get(rngReply.getNum(greetings.size())));
                     } else if (Methods.checkContains(filteredInput, "quote")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
-                        ChatBot.printf(Methods.getQuote());
-                        ChatBot.settypingStatus("");
+                        GUI.settypingStatus("Chatbot is typing...");
+                        GUI.printf(Methods.getQuote());
+                        GUI.settypingStatus("");
                     } else if (Methods.checkContains(filteredInput, "bye", "see you", "zai jian")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf(goodbye.get(rngReply.getNum(goodbye.size())));
+                        GUI.settypingStatus("");
+                        GUI.printf(goodbye.get(rngReply.getNum(goodbye.size())));
                     } else if (Methods.checkContains(filteredInput, "do you like")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("I don\'t really have a preference.");
+                        GUI.settypingStatus("");
+                        GUI.printf("I don\'t really have a preference.");
                     } else if (Methods.checkContains(filteredInput, "who are you", "who you")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("I'm a chitty chatty little bot.");
+                        GUI.settypingStatus("");
+                        GUI.printf("I'm a chitty chatty little bot.");
                     } else if (Methods.checkContains(filteredInput, "what is your name", "how do i address you")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("I am just called chatbot cause my creator have no creativity :(");
+                        GUI.settypingStatus("");
+                        GUI.printf("I am just called chatbot cause my creator have no creativity :(");
                     } else if (Methods.checkContains(filteredInput, "what do you do", "what can you do")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("I can do quite a few things for example playing music. You can see more by typing \"help\"");
+                        GUI.settypingStatus("");
+                        GUI.printf("I can do quite a few things for example playing music. You can see more by typing \"help\"");
                     } else if (Methods.checkContains(filteredInput, "ok", "yes", "no", "right")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("Okay");
+                        GUI.settypingStatus("");
+                        GUI.printf("Okay");
                     } else if (Methods.checkContains(filteredInput, "are you real")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("I am more real than most people.");
+                        GUI.settypingStatus("");
+                        GUI.printf("I am more real than most people.");
                     } else if (Methods.checkContains(filteredInput, "how are you", "how is it going")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("I'm doing quite okay");
+                        GUI.settypingStatus("");
+                        GUI.printf("I'm doing quite okay");
                     } else if (Methods.checkContains(filteredInput, "love you", "muacks", "xoxo")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("Aww That's nice.");
+                        GUI.settypingStatus("");
+                        GUI.printf("Aww That's nice.");
                     } else if (Methods.checkContains(filteredInput, "how are you created", "what are you written in")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("I am created in the Programming language called Java.");
+                        GUI.settypingStatus("");
+                        GUI.printf("I am created in the Programming language called Java.");
                     } else if (Methods.checkContains(filteredInput, "sorry", "apologise")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("" + sorry.get(rngReply.getNum(sorry.size())));
+                        GUI.settypingStatus("");
+                        GUI.printf("" + sorry.get(rngReply.getNum(sorry.size())));
                     } else if (Methods.checkContains(filteredInput, "thanks", "xie xie")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("No problem!\n");
+                        GUI.settypingStatus("");
+                        GUI.printf("No problem!\n");
                     } else if (Methods.checkContains(filteredInput, "joke", "cheer me up", "need motivation", "bored")) {
-                        ChatBot.settypingStatus("Chatbot is typing...");
+                        GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(501) + 500);
-                        ChatBot.settypingStatus("");
-                        ChatBot.printf("" + jokes.get(rngReply.getNum(jokes.size())));
+                        GUI.settypingStatus("");
+                        GUI.printf("" + jokes.get(rngReply.getNum(jokes.size())));
                     } else {
                         commands();
                     }
 
-                    ChatBot.resetInputField();
+                    GUI.resetInputField();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }.start();
@@ -200,47 +251,49 @@ public class Replies {
             switch (filteredInput) {
                 // Commands
                 case "exit":
-                    mc.Stop();
+                    mc.stop();
                     System.exit(0);
                     break;
                 case "clear":
-                    ChatBot.clearChatArea();
+                    GUI.clearChatArea();
                     break;
                 case "help":
-                    ChatBot.print(help);
+                    GUI.print(help);
                     break;
                 case "coinflip":
-                    ChatBot.printf(Methods.coinFlip());
+                    GUI.printf(Methods.coinFlip());
                     break;
                 case "list questions":
-                    ChatBot.print("List of User added Questions\n----------------------------------------------------\n");
-                    ChatBot.print(questions.questions());
+                    GUI.print("List of User added Questions\n----------------------------------------------------");
+                    for (Question q : questions) {
+                        GUI.print(q.getQuestion());
+                    }
                     break;
                 case "mc resume":
-                    mc.Resume();
-                    ChatBot.printf("Music resumed");
+                    mc.resume();
+                    GUI.printf("Music resumed");
                     break;
                 case "mc stop":
-                    mc.Stop();
+                    mc.stop();
                     mc.stopped = true;
-                    ChatBot.printf("Music stopped");
+                    GUI.printf("Music stopped");
                     break;
                 case "mc pause":
-                    mc.Pause();
-                    ChatBot.printf("Music paused");
+                    mc.pause();
+                    GUI.printf("Music paused");
                     break;
                 case "mc next":
-                    mc.Stop();
+                    mc.stop();
                     mc.next();
-                    ChatBot.printf("Playing next song");
+                    GUI.printf("Playing next song");
                     break;
                 case "mc prev":
                     if (mc.songNo > 0) {
-                        mc.Stop();
+                        mc.stop();
                         mc.prev();
-                        ChatBot.printf("Playing previous song");
+                        GUI.printf("Playing previous song");
                     } else {
-                        ChatBot.printf("No previous song");
+                        GUI.printf("No previous song");
                     }
                     break;
                 case "mc dir":
@@ -251,41 +304,54 @@ public class Replies {
                     } catch (NullPointerException ex) {
                         JOptionPane.showMessageDialog(null, "No such directory", "Error", 0);
                     }
-                    ChatBot.printf("Music directory choosen " + mc.folder);
+                    GUI.printf("Music directory choosen " + mc.folder);
                     break;
                 case "uv":
-                    ChatBot.settypingStatus("Getting data...");
-                    ChatBot.print(Methods.uvLevels());
-                    ChatBot.settypingStatus("");
+                    GUI.settypingStatus("Getting data...");
+                    GUI.print(Methods.uvLevels());
+                    GUI.settypingStatus("");
                     break;
                 case "alarm":
                     if (!clock.getAlarmTime().equals("")) {
-                        ChatBot.printf("Alarm set at " + clock.getAlarmTime());
+                        GUI.printf("Alarm set at " + clock.getAlarmTime());
                     } else {
-                        ChatBot.printf("No alarm set");
+                        GUI.printf("No alarm set");
                     }
                     break;
                 case "dismiss alarm":
                     if (clock.getAlarmTime().equals("")) {
-                        ChatBot.printf("No alarms to dismiss");
+                        GUI.printf("No alarms to dismiss");
                     } else {
-                        ChatBot.printf("Alarm dismissed");
+                        GUI.printf("Alarm dismissed");
                     }
                     clock.stopAlarm();
                     clock.setAlarmTime("");
                     break;
                 case "mc change dir":
                     mc.changeDir();
-                    ChatBot.printf("Music directory changed");
+                    GUI.printf("Music directory changed");
                     break;
                 default:
-                    ChatBot.printf(defaultReply.get(rngReply.getNum(defaultReply.size())));
+                    GUI.printf(defaultReply.get(rngReply.getNum(defaultReply.size())));
                     break;
             } // switch
         } catch (IOException ex) {
-            Logger.getLogger(ChatBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    private String writeObject() {
+        try {
+            FileOutputStream fileOut = new FileOutputStream(Paths.get(".").toAbsolutePath().normalize().toString() + "/questions.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(questions);
+            out.close();
+            fileOut.close();
+            return "Write successful";
+        } catch (IOException i) {
+            return "IOException Error";
+        }
     }
 
 }

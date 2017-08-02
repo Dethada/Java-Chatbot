@@ -3,7 +3,7 @@
  */
 package chatbot;
 
-import static chatbot.ChatBot.mc;
+import static chatbot.GUI.mc;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,8 +27,8 @@ public class Clock {
     private String currentTime;
     private String alarmTime;
 
-    private FileInputStream FIS;
-    private BufferedInputStream BIS;
+    private FileInputStream fis;
+    private BufferedInputStream bis;
     private Player player;
 
     public Clock() {
@@ -55,8 +55,8 @@ public class Clock {
                     currentTime = timeFormat.format(currentDateTime);
                     currentDate = dateFormat.format(currentDateTime);
 
-                    ChatBot.setTime(timeFormat.format(currentDateTime));
-                    ChatBot.setDisplayDate(currentDate);
+                    GUI.setTime(timeFormat.format(currentDateTime));
+                    GUI.setDisplayDate(currentDate);
 
                     try {
                         Thread.sleep(1000);
@@ -64,12 +64,12 @@ public class Clock {
                     }
 
                     if (currentTime.equals(alarmTime)) {
-                        ChatBot.printf("Alarm rang at " + currentTime);
-                        mc.Pause();
+                        GUI.printf("Alarm rang at " + currentTime);
+                        mc.pause();
                         ring(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
-                        ChatBot.setmusicDisplay("Alarm ringing");
-                        ChatBot.setnotiBarChat("Alarm ringing");
-                        ChatBot.setmusicStatus("Alarm ringing");
+                        GUI.setmusicDisplay("Alarm ringing");
+                        GUI.setnotiBarChat("Alarm ringing");
+                        GUI.setmusicStatus("Alarm ringing");
                     }
                 } // for
             } // run()
@@ -79,10 +79,10 @@ public class Clock {
     // Sound the alarm
     private void ring(String path) {
         try {
-            FIS = new FileInputStream(path);
-            BIS = new BufferedInputStream(FIS);
+            fis = new FileInputStream(path);
+            bis = new BufferedInputStream(fis);
 
-            player = new Player(BIS);
+            player = new Player(bis);
 
         } catch (FileNotFoundException | JavaLayerException ex) {
         }
@@ -105,10 +105,10 @@ public class Clock {
         if (player != null) {
             player.close();
 
-            ChatBot.setmusicDisplay("Open your music folder to play songs");
-            ChatBot.setnotiBarChat("Remeber to key in your ATS!");
-            ChatBot.setmusicStatus("Stopped");
-            ChatBot.setnoOfSongs("");
+            GUI.setmusicDisplay("Open your music folder to play songs");
+            GUI.setnotiBarChat("Remeber to key in your ATS!");
+            GUI.setmusicStatus("Stopped");
+            GUI.setnoOfSongs("");
         }
     }
 }

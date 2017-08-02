@@ -34,8 +34,8 @@ public class Music {
     private String currentSong;
     private final String settingsName;
     private final Properties prop = new Properties();
-    private FileInputStream FIS;
-    private BufferedInputStream BIS;
+    private FileInputStream fis;
+    private BufferedInputStream bis;
     private final ArrayList<String> songs;
     private final ArrayList<String> playList;
     private final Random rng = new Random();
@@ -47,41 +47,41 @@ public class Music {
         this.settingsName = "config.tut";
     }
 
-    public void Stop() {
+    public void stop() {
 
         if (player != null) {
             player.close();
             playing = false;
 
-            ChatBot.setmusicDisplay("Open your music folder to play songs");
-            ChatBot.setnotiBarChat("Remeber to key in your ATS!");
-            ChatBot.setmusicStatus("Stopped");
-            ChatBot.setnoOfSongs("");
+            GUI.setmusicDisplay("Open your music folder to play songs");
+            GUI.setnotiBarChat("Remeber to key in your ATS!");
+            GUI.setmusicStatus("Stopped");
+            GUI.setnoOfSongs("");
         }
     }
 
-    public void Pause() {
+    public void pause() {
         if (player != null) {
-            ChatBot.setmusicStatus("Paused");
+            GUI.setmusicStatus("Paused");
             playing = false;
             try {
-                pauseLocation = FIS.available();
+                pauseLocation = fis.available();
                 player.close();
             } catch (IOException ex) {
             }
         }
     }
 
-    public void Play(String path) {
+    public void play(String path) {
         playing = true;
 
         try {
-            FIS = new FileInputStream(path);
-            BIS = new BufferedInputStream(FIS);
+            fis = new FileInputStream(path);
+            bis = new BufferedInputStream(fis);
 
-            player = new Player(BIS);
+            player = new Player(bis);
 
-            songTotalLength = FIS.available();
+            songTotalLength = fis.available();
 
             setDisplayPlaying();
         } catch (FileNotFoundException | JavaLayerException ex) {
@@ -98,7 +98,7 @@ public class Music {
                     if (player.isComplete()) {
                         songNo++;
                         currentSong = playList.get(songNo);
-                        Play(folder + "\\" + currentSong);
+                        play(folder + "\\" + currentSong);
                     }
                 } catch (JavaLayerException ex) {
                 }
@@ -106,23 +106,23 @@ public class Music {
         }.start();
     }
 
-    public void Resume() throws IOException {
+    public void resume() throws IOException {
         if (!songs.isEmpty()) {
             // reshuffle playlist if music was stopped
             if (stopped) {
                 createPlaylist();
                 currentSong = playList.get(songNo);
-                Play(folder + "\\" + currentSong);
+                play(folder + "\\" + currentSong);
                 stopped = false;
             } else if (!playing) {
                 setDisplayPlaying();
                 try {
-                    FIS = new FileInputStream(folder + "\\" + currentSong);
-                    BIS = new BufferedInputStream(FIS);
+                    fis = new FileInputStream(folder + "\\" + currentSong);
+                    bis = new BufferedInputStream(fis);
 
-                    player = new Player(BIS);
+                    player = new Player(bis);
 
-                    FIS.skip(songTotalLength - pauseLocation);
+                    fis.skip(songTotalLength - pauseLocation);
                     pauseLocation = 0;
                 } catch (JavaLayerException ex) {
                 }
@@ -146,7 +146,7 @@ public class Music {
         currentSong = playList.get(songNo);
         setDisplayPlaying();
         pauseLocation = 0;
-        Play(folder + "\\" + currentSong);
+        play(folder + "\\" + currentSong);
     }
 
     public void prev() {
@@ -155,7 +155,7 @@ public class Music {
         currentSong = playList.get(songNo);
         setDisplayPlaying();
         pauseLocation = 0;
-        Play(folder + "\\" + currentSong);
+        play(folder + "\\" + currentSong);
     }
 
     // lets first user choose music dir else jus play from the saved dir
@@ -176,8 +176,8 @@ public class Music {
                 createPlaylist();
 
                 currentSong = playList.get(songNo);
-                Stop();
-                Play(folder + "\\" + currentSong);
+                stop();
+                play(folder + "\\" + currentSong);
                 saveProp("musicDir", "" + folder);
                 saveProp("fileChoosen", "yes");
             } else {
@@ -193,8 +193,8 @@ public class Music {
             createPlaylist();
 
             currentSong = playList.get(songNo);
-            Stop();
-            Play(folder + "\\" + currentSong);
+            stop();
+            play(folder + "\\" + currentSong);
         }
     }
 
@@ -258,10 +258,10 @@ public class Music {
     }
 
     private void setDisplayPlaying() {
-        ChatBot.setmusicDisplay(currentSong.substring(0, currentSong.length() - 4));
-        ChatBot.setnotiBarChat(currentSong.substring(0, currentSong.length() - 4));
-        ChatBot.setmusicStatus("Playing");
-        ChatBot.setnoOfSongs(songNo + 1 + "/" + playList.size());
+        GUI.setmusicDisplay(currentSong.substring(0, currentSong.length() - 4));
+        GUI.setnotiBarChat(currentSong.substring(0, currentSong.length() - 4));
+        GUI.setmusicStatus("Playing");
+        GUI.setnoOfSongs(songNo + 1 + "/" + playList.size());
     }
 
 } // End Music class

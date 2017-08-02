@@ -1,5 +1,5 @@
 /*
- * Api_info object (Within UV)
+ * ApiInfo object (Within UV)
  */
 package chatbot;
 
@@ -7,7 +7,7 @@ package chatbot;
  *
  * @author David
  */
-public class Api_info {
+public class ApiInfo {
 
     private String status;
 

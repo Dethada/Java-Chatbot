@@ -9,12 +9,12 @@ package chatbot;
  */
 public class UV {
 
-    private Api_info api_info;
+    private ApiInfo apiInfo;
 
     private Items[] items;
 
-    public Api_info getApi_info() {
-        return api_info;
+    public ApiInfo getApiInfo() {
+        return apiInfo;
     }
 
     public Items[] getItems() {
