@@ -85,7 +85,7 @@ public class Replies {
                             String questionText = Methods.filter(questionField.getText());
                             String answerText = answerField.getText();
                             if (!questionText.isEmpty() && !answerText.isEmpty()) {
-                                questions.add(new Question(questionText, answerText));
+                                questions.add(new Question(questionText, answerField.getText()));
 
                                 questionField.setText("");
                                 answerField.setText("");
