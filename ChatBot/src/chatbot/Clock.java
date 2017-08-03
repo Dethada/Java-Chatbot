@@ -1,9 +1,8 @@
 /*
- * Clock
+ * Alarm Clock
  */
 package chatbot;
 
-import static chatbot.GUI.mc;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -65,7 +64,7 @@ public class Clock {
 
                     if (currentTime.equals(alarmTime)) {
                         GUI.printf("Alarm rang at " + currentTime);
-                        mc.pause();
+                        GUI.player.pause();
                         ring(Paths.get(".").toAbsolutePath().normalize().toString() + "\\alarm.mp3");
                         GUI.setmusicDisplay("Alarm ringing");
                         GUI.setnotiBarChat("Alarm ringing");

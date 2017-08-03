@@ -25,9 +25,9 @@ import javazoom.jl.player.Player;
  */
 public class Music {
 
-    boolean stopped;
-    int songNo;
-    File folder;
+    private boolean stopped;
+    private int songNo;
+    private File folder;
     private long pauseLocation;
     private long songTotalLength;
     private boolean playing;
@@ -198,29 +198,6 @@ public class Music {
         }
     }
 
-    public void getSongs(File[] listOfFiles) {
-        for (File file : listOfFiles) {
-            if (file.isFile() && file.getName().endsWith(".mp3")) {
-                songs.add(file.getName());
-            }
-        }
-    }
-
-    // gets the songs in the dir and shuffles them into a playlist
-    public void createPlaylist() {
-        songNo = 0;
-        playList.clear();
-        for (int i = 0; i < songs.size(); i++) {
-            String name = songs.get(rng.nextInt(songs.size()));
-
-            if (!playList.contains(name)) {
-                playList.add(name);
-            } else {
-                i--;
-            }
-        }
-    }
-
     // changes the stored music dir
     public void changeDir() {
         JFileChooser chooser = new JFileChooser("D:\\Media");
@@ -237,7 +214,50 @@ public class Music {
         }
     }
 
-    public void saveProp(String title, String value) {
+    public String getFolder() {
+        return "" + folder;
+    }
+
+    public int getSongNo() {
+        return songNo;
+    }
+
+    public boolean isPlaying() {
+        if (stopped) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public void setStopped(boolean x) {
+        stopped = x;
+    }
+
+    private void getSongs(File[] listOfFiles) {
+        for (File file : listOfFiles) {
+            if (file.isFile() && file.getName().endsWith(".mp3")) {
+                songs.add(file.getName());
+            }
+        }
+    }
+
+    // gets the songs in the dir and shuffles them into a playlist
+    private void createPlaylist() {
+        songNo = 0;
+        playList.clear();
+        for (int i = 0; i < songs.size(); i++) {
+            String name = songs.get(rng.nextInt(songs.size()));
+
+            if (!playList.contains(name)) {
+                playList.add(name);
+            } else {
+                i--;
+            }
+        }
+    }
+
+    private void saveProp(String title, String value) {
         try {
             prop.setProperty(title, value);
             prop.store(new FileOutputStream(settingsName), null);

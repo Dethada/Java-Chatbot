@@ -4,7 +4,7 @@
 package chatbot;
 
 import static chatbot.GUI.clock;
-import static chatbot.GUI.mc;
+import static chatbot.GUI.player;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -85,6 +85,12 @@ public class Replies {
                             String questionText = Methods.filter(questionField.getText());
                             String answerText = answerField.getText();
                             if (!questionText.isEmpty() && !answerText.isEmpty()) {
+                                // If question already exist remove it
+                                for (int i = 0; i < questions.size(); i++) {
+                                    if (questionText.equals(questions.get(i).getQuestion())) {
+                                        questions.remove(i);
+                                    }
+                                }
                                 questions.add(new Question(questionText, answerField.getText()));
 
                                 questionField.setText("");
@@ -168,11 +174,6 @@ public class Replies {
                         Thread.sleep(rngTime.getNum(251) + 500);
                         GUI.settypingStatus("");
                         GUI.printf("I can do quite a few things for example playing music. You can see more by typing \"help\"");
-                    } else if (Methods.checkContains(filteredInput, "ok", "yes", "no", "right")) {
-                        GUI.settypingStatus("Chatbot is typing...");
-                        Thread.sleep(rngTime.getNum(251) + 500);
-                        GUI.settypingStatus("");
-                        GUI.printf("Okay");
                     } else if (Methods.checkContains(filteredInput, "are you real")) {
                         GUI.settypingStatus("Chatbot is typing...");
                         Thread.sleep(rngTime.getNum(251) + 500);
@@ -208,6 +209,11 @@ public class Replies {
                         Thread.sleep(rngTime.getNum(501) + 500);
                         GUI.settypingStatus("");
                         GUI.printf("" + jokes.get(rngReply.getNum(jokes.size())));
+                    } else if (Methods.checkContains(filteredInput, "ok", "yes", "no", "right")) {
+                        GUI.settypingStatus("Chatbot is typing...");
+                        Thread.sleep(rngTime.getNum(251) + 500);
+                        GUI.settypingStatus("");
+                        GUI.printf("Okay");
                     } else {
                         commands();
                     }
@@ -251,7 +257,7 @@ public class Replies {
             switch (filteredInput) {
                 // Commands
                 case "exit":
-                    mc.stop();
+                    player.stop();
                     System.exit(0);
                     break;
                 case "clear":
@@ -270,27 +276,27 @@ public class Replies {
                     }
                     break;
                 case "mc resume":
-                    mc.resume();
+                    player.resume();
                     GUI.printf("Music resumed");
                     break;
                 case "mc stop":
-                    mc.stop();
-                    mc.stopped = true;
+                    player.stop();
+                    player.setStopped(true);
                     GUI.printf("Music stopped");
                     break;
                 case "mc pause":
-                    mc.pause();
+                    player.pause();
                     GUI.printf("Music paused");
                     break;
                 case "mc next":
-                    mc.stop();
-                    mc.next();
+                    player.stop();
+                    player.next();
                     GUI.printf("Playing next song");
                     break;
                 case "mc prev":
-                    if (mc.songNo > 0) {
-                        mc.stop();
-                        mc.prev();
+                    if (player.getSongNo() > 0) {
+                        player.stop();
+                        player.prev();
                         GUI.printf("Playing previous song");
                     } else {
                         GUI.printf("No previous song");
@@ -298,13 +304,13 @@ public class Replies {
                     break;
                 case "mc dir":
                     try {
-                        mc.chooseDir();
+                        player.chooseDir();
                     } catch (IndexOutOfBoundsException ex) {
                         JOptionPane.showMessageDialog(null, "No playable files", "Error", 0);
                     } catch (NullPointerException ex) {
                         JOptionPane.showMessageDialog(null, "No such directory", "Error", 0);
                     }
-                    GUI.printf("Music directory choosen " + mc.folder);
+                    GUI.printf("Music directory choosen " + player.getFolder());
                     break;
                 case "uv":
                     GUI.settypingStatus("Getting data...");
@@ -328,7 +334,7 @@ public class Replies {
                     clock.setAlarmTime("");
                     break;
                 case "mc change dir":
-                    mc.changeDir();
+                    player.changeDir();
                     GUI.printf("Music directory changed");
                     break;
                 default:

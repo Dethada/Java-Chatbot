@@ -21,7 +21,7 @@ import javax.swing.text.StyledDocument;
  */
 public class GUI extends javax.swing.JFrame {
 
-    static Music mc;
+    static Music player;
     static Clock clock;
     private final Replies replies;
     // For font color
@@ -33,7 +33,7 @@ public class GUI extends javax.swing.JFrame {
         initComponents();
         clock = new Clock();
         this.replies = new Replies();
-        this.mc = new Music();
+        this.player = new Music();
 
         // Set font color
         doc = chatArea.getStyledDocument();
@@ -42,7 +42,7 @@ public class GUI extends javax.swing.JFrame {
         StyleConstants.setForeground(orange, Color.ORANGE);
         StyleConstants.setForeground(white, Color.WHITE);
 
-        if (mc.getProp("fileChoosen").equals("yes")) {
+        if (player.getProp("fileChoosen").equals("yes")) {
             musicDisplay.setText("Click the three dots to start");
         }
 
@@ -333,25 +333,25 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_chatButtonHomeMouseReleased
 
     private void stopMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stopMouseReleased
-        mc.stop();
-        mc.stopped = true;
+        player.stop();
+        player.setStopped(true);
     }//GEN-LAST:event_stopMouseReleased
 
     private void playMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_playMouseReleased
         try {
-            mc.resume();
+            player.resume();
         } catch (IOException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_playMouseReleased
 
     private void pauseMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pauseMouseReleased
-        mc.pause();
+        player.pause();
     }//GEN-LAST:event_pauseMouseReleased
 
     private void chooseMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chooseMouseReleased
         try {
-            mc.chooseDir();
+            player.chooseDir();
         } catch (IndexOutOfBoundsException ex) {
             JOptionPane.showMessageDialog(null, "No playable files", "Error", 0);
         } catch (NullPointerException ex) {
@@ -360,14 +360,14 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_chooseMouseReleased
 
     private void nextMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_nextMouseReleased
-        mc.stop();
-        mc.next();
+        player.stop();
+        player.next();
     }//GEN-LAST:event_nextMouseReleased
 
     private void previousMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_previousMouseReleased
-        if (mc.songNo > 0) {
-            mc.stop();
-            mc.prev();
+        if (player.getSongNo() > 0) {
+            player.stop();
+            player.prev();
         }
     }//GEN-LAST:event_previousMouseReleased
 
