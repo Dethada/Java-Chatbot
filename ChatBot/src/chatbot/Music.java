@@ -89,7 +89,7 @@ public class Music {
             Logger.getLogger(Music.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        new Thread() {
+        new Thread("Music") {
             @Override
             public void run() {
                 try {
