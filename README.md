@@ -20,5 +20,4 @@ A kind of useful chabot
 
 ## To-dos
 * Fix autoscroll
-* Fix last song problem
 * Add more replies
